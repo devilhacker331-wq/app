@@ -1,0 +1,23 @@
+<?php 
+$lang['panel_title'] = 'অ্যাডনস';
+$lang['add_title'] = 'একটি অ্যাডোন যোগ করুন';
+$lang['addons_file'] = 'ফাইল';
+$lang['addons_addons'] = 'অ্যাডনস';
+$lang['addons_list'] = 'অ্যাডোনস তালিকা';
+$lang['addons_slno'] = '#';
+$lang['addons_package_name'] = 'প্যাকেজের নাম';
+$lang['addons_slug'] = 'স্লাগ';
+$lang['addons_description'] = 'বর্ণনা';
+$lang['addons_version'] = 'সংস্করণ';
+$lang['addons_author'] = 'লেখক';
+$lang['addons_files'] = 'নথি পত্র';
+$lang['addons_preview_image'] = 'পূর্বরূপ চিত্র';
+$lang['addons_date'] = 'তারিখ';
+$lang['addons_status'] = 'স্থিতি';
+$lang['addons_action'] = 'কর্ম';
+$lang['addons_upload'] = 'আপলোড করুন';
+$lang['addons_delete'] = 'মুছে ফেলা';
+$lang['addons_success'] = 'সাফল্য';
+$lang['addons_failed'] = 'ব্যর্থ হয়েছে';
+$lang['addons_file_browse'] = 'ফাইল ব্রাউজ করুন';
+$lang['addons_clear'] = 'স্পষ্ট';

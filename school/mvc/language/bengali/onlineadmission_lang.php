@@ -1,0 +1,77 @@
+<?php
+$lang['slno'] = "#";
+$lang['panel_title'] = "অনলাইন ভর্তি";
+$lang['onlineadmission_approve'] = "অনুমোদন";
+$lang['onlineadmission_name'] = "নাম";
+$lang['onlineadmission_dob'] = "জন্ম তারিখ";
+$lang['onlineadmission_admission_date'] = "ভর্তি তারিখ";
+$lang['onlineadmission_email'] = "ইমেল";
+$lang['onlineadmission_gender'] = "লিঙ্গ";
+$lang['onlineadmission_phone'] = "ফোন";
+$lang['onlineadmission_approved'] = "অনুমোদিত";
+$lang['onlineadmission_decline'] = "অস্বীকৃতি";
+$lang['onlineadmission_waiting'] = "অপেক্ষা";
+$lang['onlineadmission_pending'] = "মুলতুবি";
+$lang['onlineadmission_document'] = "নথিপত্র";
+$lang['onlineadmission_status'] = "স্থিতি";
+$lang['onlineadmission_type'] = "টাইপ";
+$lang['onlineadmission_apply_classes'] = "ক্লাস প্রয়োগ করুন";
+$lang['onlineadmission_onlineadmission'] = "অনলাইন ভর্তি আইডি";
+$lang['onlineadmission_admissionID'] = "ভর্তি আইডি";
+
+$lang['onlineadmission_photo'] = "ফটো";
+$lang['onlineadmission_sex_male'] = "পুরুষ";
+$lang['onlineadmission_sex_female'] = "মহিলা";
+$lang['onlineadmission_religion'] = "ধর্ম";
+$lang['onlineadmission_address'] = "ঠিকানা";
+$lang['onlineadmission_classes'] = "ক্লাস";
+$lang['onlineadmission_section'] = "বিভাগ";
+$lang['onlineadmission_roll'] = "রোল";
+$lang['onlineadmission_username'] = "ব্যবহারকারীর নাম";
+$lang['onlineadmission_password'] = "পাসওয়ার্ড";
+$lang['onlineadmission_select_class'] = "ক্লাস নির্বাচন করুন";
+$lang['onlineadmission_select_section'] = "বিভাগ নির্বাচন করুন";
+$lang['onlineadmission_select_schoolyear'] = 'শিক্ষাবর্ষ নির্বাচন করুন';
+$lang['onlineadmission_schoolyear'] = 'একাডেমিক ইয়ার';
+$lang['onlineadmission_bloodgroup'] = 'ব্লাড গ্রুপ';
+$lang['onlineadmission_guargian'] = "অভিভাবক";
+$lang['onlineadmission_country'] = 'দেশ';
+$lang['onlineadmission_registerNO'] = 'রেজিস্টার নম্বর';
+$lang['onlineadmission_state'] = 'State';
+
+$lang['onlineadmission_studentgroup'] = 'গ্রুপ';
+$lang['onlineadmission_select_studentgroup'] = 'দল নির্বাচন করুন';
+$lang['onlineadmission_select_bloodgroup'] = 'ব্লাড গ্রুপ নির্বাচন করুন';
+$lang['onlineadmission_select_country'] = 'দেশ নির্বাচন করুন';
+$lang['onlineadmission_optionalsubject'] = 'ঐচ্ছিক বিষয়';
+$lang['onlineadmission_select_optionalsubject'] = 'ঐচ্ছিক বিষয় নির্বাচন করুন';
+$lang['onlineadmission_extracurricularactivities'] = 'অতিরিক্ত পাঠ্যক্রমিক কার্যক্রম';
+$lang['onlineadmission_remarks'] = 'রিমার্কস';
+$lang['onlineadmission_file_browse'] = 'ফাইল ব্রাউজ';
+$lang['onlineadmission_clear'] = 'ক্লিয়ার';
+$lang['onlineadmission_view'] = 'দেখুন';
+$lang['onlineadmission_profile'] = 'প্রোফাইল';
+$lang['onlineadmission_data_not_found'] = "কোন ডেটা নেই";
+$lang['onlineadmission_permissionmethod'] = "পদ্ধতি অনুমোদিত নয়";
+$lang['onlineadmission_permission'] = "অনুমতি অনুমোদিত নয়";
+
+$lang['onlineadmission_apply_class'] = "ক্লাস প্রয়োগ করুন";
+$lang['onlineadmission_apply_date'] = "আবেদনের তারিখ";
+
+$lang['action'] = "অ্যাকশন";
+$lang['view'] = 'দেখুন';
+$lang['edit'] = 'সম্পাদনা';
+$lang['delete'] = 'মুছুন';
+$lang['print'] = 'প্রিন্ট';
+$lang['pdf_preview'] = 'PDF প্রিভিউ';
+$lang["mail"] = "মেইলে পিডিএফ পাঠান";
+
+$lang['to'] = 'প্রতি';
+$lang['subject'] = 'বিষয়';
+$lang['message'] = 'মেসেজ';
+$lang['send'] = 'পাঠান';
+$lang['mail_to'] = "টু ফিল্ড আবশ্যক";
+$lang['mail_valid'] = "টু ফিল্ডে অবশ্যই একটি বৈধ ইমেল ঠিকানা থাকতে হবে";
+$lang['mail_subject'] = "বিষয় ক্ষেত্রটি প্রয়োজন";
+$lang['mail_success'] = 'ইমেল সফলভাবে পাঠান';
+$lang['mail_error'] = 'ওহো, ইমেল পাঠানো হয়নি';

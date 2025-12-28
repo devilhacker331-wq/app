@@ -1,0 +1,37 @@
+//========================================
+//          1 - HELPERS FOLDER
+//========================================
+@import '1-helpers/directions';
+@import '1-helpers/breakpoints';
+@import '1-helpers/colors';
+@import '1-helpers/mixins';
+@import '1-helpers/globals';
+@import '1-helpers/typography';
+
+
+//========================================
+//          2 - COMPONENTS FOLDER
+//========================================
+@import "2-components/carousel-arrow";
+@import "2-components/keyframes";
+@import "2-components/button";
+@import "2-components/form";
+@import "2-components/preloader";
+
+
+//=======================================
+//          3 - ELEMENTS FOLDER
+//=======================================
+@import "3-elements/feature-card";
+@import "3-elements/teacher-card";
+@import "3-elements/event-card";
+@import "3-elements/blog-card";
+@import "3-elements/notice-card";
+
+
+//=======================================
+//          4 - LAYOUTS FOLDER
+//=======================================
+@import "4-layouts/header";
+@import "4-layouts/section";
+@import "4-layouts/footer";

@@ -1,0 +1,160 @@
+@import "../1-helpers/directions";
+@import "../1-helpers/breakpoints";
+@import "../1-helpers/colors";
+@import "../1-helpers/mixins";
+
+.login {
+    padding-block: 80px;
+
+    @include tablet-breakpoint {
+        padding-block: 50px;
+    }
+}
+
+.login-group {
+    display: flex;
+    gap: 100px;
+
+    @include laptop-breakpoint {
+        gap: 40px;
+    }
+}
+
+.login-content {
+    width: 550px;
+    flex-shrink: 0;
+
+    @include desktop-breakpoint {
+        width: 450px;
+    }
+
+    @include laptop-breakpoint {
+        width: 350px;
+    }
+
+    @include tablet-breakpoint {
+        width: 100%;
+    }
+
+    a {
+        margin-bottom: 30px;
+
+        img {
+            width: 160px;
+        }
+    }
+
+    h3 {
+        font-size: 35px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        text-transform: capitalize;
+
+        @include tablet-breakpoint {
+            font-size: 25px;
+        }
+    }
+
+    p {
+        font-size: 16px;
+        color: #7A6F69;
+        margin-bottom: 30px;
+    }
+
+    h4 {
+        font-size: 18px;
+        margin-bottom: 24px;
+
+        @include tablet-breakpoint {
+            font-size: 16px;
+        }
+    }
+
+    nav {
+        display: flex;
+        flex-wrap: wrap;
+        column-gap: 12px;
+        row-gap: 16px;
+
+        button {
+            font-size: 18px;
+            font-weight: 600;
+            padding: 6px 15px;
+            text-align: center;
+            text-transform: capitalize;
+            color: var(--white);
+
+            @include mobile-breakpoint {
+                font-size: 14px;
+            }
+
+            &:nth-child(1) { background-color: #008BF0; }
+            &:nth-child(2) { background-color: #00B2D9; }
+            &:nth-child(3) { background-color: #7A4BFF; }
+            &:nth-child(4) { background-color: #00BC29; }
+            &:nth-child(5) { background-color: #FF7624; }
+            &:nth-child(6) { background-color: #A55FFF; }
+            &:nth-child(7) { background-color: #FF5391; }
+        }
+    }
+}
+
+.login-form {
+    margin-bottom: 30px;
+
+    button {
+        width: 100%;
+        margin-top: 10px;
+    }
+}
+
+.login-banner {
+    width: 100%;
+    flex: auto;
+    position: relative;
+
+    @include tablet-breakpoint {
+        display: none;
+    }
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    div {
+        position: absolute;
+        width: 80%;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 50px;
+        padding: 20px;
+        background: linear-gradient(113deg, rgba(255, 255, 255, 0.80) 0%, rgba(255, 255, 255, 0.50) 100%);
+        backdrop-filter: blur(10px);
+    }
+
+    blockquote {
+        font-size: 22px;
+        font-weight: 700;
+        font-style: italic;
+        text-align: center;
+        margin-bottom: 20px;
+
+        @include laptop-breakpoint {
+            font-size: 18px;
+        }
+    }
+
+    label {
+        display: block;
+        width: 100%;
+        font-size: 18px;
+        font-weight: 700;
+        text-align: right;
+
+        @include laptop-breakpoint {
+            font-size: 14px;
+        }
+    }
+}

@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'Times New Roman';
+    font-style: normal;
+    font-weight: 700;
+    font-stretch: 100%;
+    font-display: swap;
+    src: url('../times-new-roman/times new roman bold.ttf') format('woff2');
+}
+
+@font-face {
+    font-family: 'Tmes New Roman';
+    font-style: normal;
+    font-weight: 300;
+    font-stretch: 100%;
+    font-display: swap;
+    src: url('../times-new-roman/times new roman.ttf') format('woff2');
+}
+  

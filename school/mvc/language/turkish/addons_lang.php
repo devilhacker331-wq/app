@@ -1,0 +1,23 @@
+<?php 
+$lang['panel_title'] = 'Eklentiler';
+$lang['add_title'] = 'Eklenti ekle';
+$lang['addons_file'] = 'Dosya';
+$lang['addons_addons'] = 'Eklentiler';
+$lang['addons_list'] = 'Eklenti Listesi';
+$lang['addons_slno'] = '#';
+$lang['addons_package_name'] = 'Paket ismi';
+$lang['addons_slug'] = 'Sümüklüböcek';
+$lang['addons_description'] = 'Açıklama';
+$lang['addons_version'] = 'Sürüm';
+$lang['addons_author'] = 'Yazar';
+$lang['addons_files'] = 'Dosyalar';
+$lang['addons_preview_image'] = 'Önizleme resmi';
+$lang['addons_date'] = 'Tarih';
+$lang['addons_status'] = 'Durum';
+$lang['addons_action'] = 'Aksiyon';
+$lang['addons_upload'] = 'Yükle';
+$lang['addons_delete'] = 'Sil';
+$lang['addons_success'] = 'Başarı';
+$lang['addons_failed'] = 'Başarısız oldu';
+$lang['addons_file_browse'] = 'Dosyaya Göz At';
+$lang['addons_clear'] = 'Açık';

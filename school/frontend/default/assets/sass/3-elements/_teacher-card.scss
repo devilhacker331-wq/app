@@ -1,0 +1,73 @@
+.teacher-card {
+    overflow: hidden;
+    border-radius: 4px;
+
+    &:hover {
+        .teacher-overlay {
+            transform: scaleY(1);
+        }
+
+        .teacher-avater {
+            transform: scale(1.1) rotate(0.8deg);
+        }
+    }
+}
+
+.teacher-media {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.teacher-avater {
+    width: 100%;
+    @include transition-linear;
+}
+
+.teacher-overlay {
+    position: absolute;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 20px;
+    top: 0px;
+    #{$start-direction}: 0px;
+    transform: scaleY(0);
+    transform-origin: bottom;
+    padding: 28px;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(250, 94, 1, 0) 0%, rgba(250, 94, 1, 0.6) 100%);
+    @include transition-linear;
+
+    a {
+        font-size: 28px;
+        color: var(--white);
+        @include transition-linear;
+
+        &:hover {
+            transform: translateY(-5px);
+        }
+    }
+}
+
+.teacher-meta {
+    h3 {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 28px;
+        margin-bottom: 6px;
+        text-transform: capitalize;
+
+        @include mobile-breakpoint {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+    }
+
+    p {
+        font-size: 14px;
+        line-height: 22px;
+        color: var(--text-black);
+    }
+}

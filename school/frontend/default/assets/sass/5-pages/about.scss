@@ -1,0 +1,128 @@
+@import "../1-helpers/directions";
+@import "../1-helpers/breakpoints";
+@import "../1-helpers/colors";
+@import "../1-helpers/mixins";
+
+
+//=======================================
+//          ABOUT PART STYLE
+//=======================================
+.about-part {
+    padding-block: 100px;
+
+    @include laptop-breakpoint {
+        padding-block: 80px;
+    }
+
+    @include tablet-breakpoint {
+        padding-block: 60px;
+    }
+}
+
+.about-content {
+    width: 900px;
+    padding: 40px 30px;
+    margin-top: 120px;
+    background-color: var(--white);
+
+    @include desktop-breakpoint {
+        width: 770px;
+        margin-top: 80px;
+    }
+
+    @include laptop-breakpoint {
+        width: 100%;
+        margin-top: 40px;
+    }
+
+    .section-title {
+        margin-bottom: 30px;
+    }
+
+    p {
+        width: 100%;
+        max-width: 450px;
+        font-size: 18px;
+        line-height: 30px;
+
+        @include desktop-breakpoint {
+            max-width: 418px;
+        }
+
+        @include laptop-breakpoint {
+            max-width: 100%;
+        }
+    }
+}
+
+.about-media {
+    img {
+        width: 100%;
+    }
+}
+
+//=======================================
+//          HISTORY PART STYLE
+//=======================================
+.history-part {
+    background-image: url('../../images/about/03.jpg');
+    @include background-image;
+}
+
+.history-overlay {
+    padding: 60px 0px;
+    background-color: rgba($black, 65%);
+}
+
+.history-content {
+    .section-title {
+        margin-bottom: 70px;
+        color: var(--white);
+    }
+
+    h3 {
+        color: var(--white);
+        margin-bottom: 32px;
+        text-transform: capitalize;
+    }
+
+    p {
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 30px;
+        color: var(--white);
+
+        @include tablet-breakpoint {
+            margin-bottom: 50px;
+        }
+    }
+}
+
+//=======================================
+//          VISION PART STYLE
+//=======================================
+.vision-part {
+    padding-block: 100px;
+
+    @include laptop-breakpoint {
+        padding-block: 80px;
+    }
+
+    @include tablet-breakpoint {
+        padding-block: 60px;
+    }
+}
+
+.vision-content {
+    padding: 40px 30px;
+    background-color: var(--white);
+
+    .section-title {
+        margin-bottom: 16px;
+    }
+
+    p {
+        font-size: 18px;
+        line-height: 30px;
+    }
+}

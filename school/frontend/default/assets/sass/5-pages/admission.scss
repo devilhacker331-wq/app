@@ -1,0 +1,211 @@
+@import "../1-helpers/directions";
+@import "../1-helpers/breakpoints";
+@import "../1-helpers/colors";
+@import "../1-helpers/mixins";
+
+
+//=======================================
+//         ADMISSION PART STYLE
+//=======================================
+.admission-part {
+    padding-block: 100px;
+
+    @include laptop-breakpoint {
+        padding-block: 80px;
+    }
+
+    @include tablet-breakpoint {
+        padding-block: 60px;
+    }
+}
+
+.admission-describe {
+    width: 100%;
+    flex-shrink: 0;
+    text-align: right;
+    padding: 24px 30px;
+    background-color: var(--primary-slate);
+
+    span {
+        color: var(--primary);
+    }
+}
+
+.admission-content {
+    width: 100%;
+    padding: 32px;
+    margin-top: 70px;
+    position: relative;
+    background-color: var(--white);
+    z-index: 1;
+
+    @include desktop-breakpoint {
+        margin-top: 50px;
+    }
+
+    @include laptop-breakpoint {
+        margin-top: 30px;
+    }
+
+    .section-title {
+        margin-bottom: 20px;
+    }
+
+    .row {
+        align-items: flex-end;
+    }
+
+    .form-control {
+        @include tablet-breakpoint {
+            margin-bottom: 24px;
+        }
+    }
+
+    .btn {
+        width: 100%;
+        height: 48px;
+        line-height: 48px;
+        padding: 0px;
+
+        @include custom-breakpoint(767px, 992px) {
+            font-size: 16px;
+        }
+    }
+}
+
+
+//=======================================
+//          APPLY PART STYLE
+//=======================================
+.apply-part {
+    margin-bottom: 100px;
+
+    @include laptop-breakpoint {
+        margin-bottom: 80px;
+    }
+
+    @include tablet-breakpoint {
+        margin-bottom: 60px;
+    }
+}
+
+.apply-content {
+    padding: 48px 32px;
+    background-color: var(--white);
+
+    .section-title {
+        margin-bottom: 45px;
+    }
+
+    .btn {
+        width: 100%;
+        max-width: 180px;
+        margin-top: 30px;
+    }
+}
+
+.apply-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 35px;
+    row-gap: 30px;
+
+    @include tablet-breakpoint {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .form-group {
+        margin: 0px;
+    }
+}
+
+
+//=======================================
+//          RESULT PART STYLE
+//=======================================
+.result-list {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 12px;
+}
+
+.result-item {
+    width: 50%;
+    display: flex;
+    gap: 12px;
+
+    @include laptop-breakpoint {
+        width: 100%;
+    }
+
+    @include mobile-breakpoint {
+        width: 100%;
+        flex-direction: column;
+        gap: 0px;
+    }
+
+    span {
+        &:first-child {
+            width: 130px;
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 30px;
+            flex-shrink: 0;
+            text-transform: capitalize;
+        }
+
+        &:last-child {
+            width: 270px;
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 30px;
+
+            &.result-status {
+                font-size: 14px;
+                font-weight: 600;
+                line-height: 20px;
+                padding: 6px 16px;
+                color: #FF9900;
+                height: fit-content;
+                width: fit-content;
+                background-color: #FFF7DC;
+            }
+        }
+    }
+}
+
+.result-group {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin-bottom: 35px;
+
+    @include tablet-breakpoint {
+        margin-bottom: 12px;
+    }
+
+    @include mobile-breakpoint {
+        margin-bottom: 25px;
+    }
+
+    img {
+        width: 150px;
+        flex-shrink: 0;
+    }
+
+    .result-list {
+        flex-direction: column;
+        row-gap: 12px;
+    }
+
+    .result-item {
+        width: fit-content;
+
+        span {
+            &:last-child {
+                width: auto;
+            }
+        }
+    }
+}

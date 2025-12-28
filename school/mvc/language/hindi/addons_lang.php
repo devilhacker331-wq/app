@@ -1,0 +1,23 @@
+<?php 
+$lang['panel_title'] = 'ऐड-ऑन';
+$lang['add_title'] = 'एक ऐड जोड़ें';
+$lang['addons_file'] = 'फ़ाइल';
+$lang['addons_addons'] = 'ऐड-ऑन';
+$lang['addons_list'] = 'Addons सूची';
+$lang['addons_slno'] = '#';
+$lang['addons_package_name'] = 'पैकेज का नाम';
+$lang['addons_slug'] = 'काउंटर';
+$lang['addons_description'] = 'विवरण';
+$lang['addons_version'] = 'संस्करण';
+$lang['addons_author'] = 'लेखक';
+$lang['addons_files'] = 'फ़ाइलें';
+$lang['addons_preview_image'] = 'पूर्वावलोकन छवि';
+$lang['addons_date'] = 'तारीख';
+$lang['addons_status'] = 'स्थिति';
+$lang['addons_action'] = 'कार्य';
+$lang['addons_upload'] = 'डालना';
+$lang['addons_delete'] = 'हटाएं';
+$lang['addons_success'] = 'सफलता';
+$lang['addons_failed'] = 'अनुत्तीर्ण होना';
+$lang['addons_file_browse'] = 'फ़ाइल ब्राउज़ करें';
+$lang['addons_clear'] = 'स्पष्ट';

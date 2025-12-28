@@ -1,0 +1,115 @@
+.form-group {
+    margin-bottom: 20px;
+    position: relative;
+
+    .fa-chevron-down {
+        position: absolute;
+        top: 70px;
+        right: 0px;
+        font-size: 14px;
+    }
+}
+
+.form-label {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 24px;
+    margin-bottom: 12px;
+    text-transform: capitalize;
+    color: var(--black);
+
+    &.required {
+        &::after {
+            content: "*";
+            line-height: 0px;
+            margin-inline-start: 4px;
+            display: inline-block;
+            color: var(--red);
+        }
+    }
+}
+
+.form-control {
+    width: 100%;
+    height: 48px;
+    border-radius: 4px;
+    border: 1px solid #C0BBB5;
+
+    &:focus {
+        box-shadow: none;
+        border-color: var(--primary);
+    }
+
+    &.line {
+        padding: 0px;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+    }
+}
+
+textarea.form-control {
+    height: 160px;
+}
+
+.form-control[type=file] {
+    opacity: 0;
+}
+
+.form-control[type=number] {
+    appearance: none;
+}
+
+select.form-control {
+    cursor: pointer;
+}
+
+.form-file-group {
+    width: 100%;
+    height: 48px;
+    border-radius: 4px;
+    border: 1px solid #C0BBB5;
+    background-color: #ffffff;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.form-file {
+    padding: 5px 8px;
+    gap: 6px;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    background-color: #F0F0F0;
+    position: absolute;
+    bottom: 9px;
+    #{$start-direction}: 8px;
+    opacity: 0;
+}
+
+.form-value {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 20px;
+    max-width: 100px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.form-close {
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--primary);
+}
+
+.form-upload {
+    padding-inline: 10px;
+    flex-shrink: 0;
+    cursor: pointer;
+
+    svg {
+        width: 30px;
+    }
+}

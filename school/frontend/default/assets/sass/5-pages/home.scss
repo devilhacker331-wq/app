@@ -1,0 +1,608 @@
+@import "../1-helpers/directions";
+@import "../1-helpers/breakpoints";
+@import "../1-helpers/colors";
+@import "../1-helpers/mixins";
+
+
+//=======================================
+//          BANNERT PART STYLE
+//=======================================
+.banner-part {
+    background-image: url('../../images/bg/hero.jpg');
+    @include background-image;
+}
+
+.banner-carousel {
+    .owl-dots {
+        position: absolute;
+        display: flex;
+        gap: 24px;
+        bottom: 30px;
+        #{$start-direction}: 50%;
+        transform: translateX(#{$translate-start});
+
+        .owl-dot {
+            width: 30px;
+            height: 3px;
+            background-color: var(--white);
+
+            &.active {
+                background-color: var(--primary);
+            }
+        }
+    }
+}
+
+.banner-overlay {
+    padding: 80px 0px;
+    background: linear-gradient(0deg, rgba(52, 42, 37, 0.7), rgba(52, 42, 37, 0.7));
+
+    @include laptop-breakpoint {
+        padding: 60px 0px;
+    }
+
+    @include tablet-breakpoint {
+        padding: 40px 0px;
+    }
+}
+
+.banner-group {
+    @include flex(flex, center, space-between, 50px);
+    padding-inline-end: 80px;
+
+    @include laptop-breakpoint {
+        padding-inline-end: 0px;
+    }
+
+    @include tablet-breakpoint {
+        gap: 80px;
+        padding: 30px 0px;
+        flex-direction: column;
+    }
+}
+
+.banner-content {
+    width: 100%;
+    max-width: 550px;
+
+    span {
+        display: block;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 22px;
+        margin-bottom: 50px;
+        padding-top: 10px;
+        position: relative;
+        text-transform: uppercase;
+        color: var(--white);
+        
+        @include tablet-breakpoint {
+            font-size: 14px;
+            line-height: 22px;
+            margin-bottom: 40px;
+        }
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: 0px;
+            #{$start-direction}: 0px;
+            width: 34px;
+            height: 2px;
+            background-color: var(--white);
+        }
+
+        @include mobile-breakpoint {
+            font-size: 14x;
+            margin-bottom: 36px;
+        }
+    }
+
+    h1 {
+        color: var(--white);
+        margin-bottom: 20px;
+        text-transform: capitalize;
+
+        @include tablet-breakpoint {
+            font-size: 42px;
+            line-height: 50px;
+            margin-bottom: 15px;
+        }
+    }
+
+    p {
+        font-size: 20px;
+        font-weight: 400;
+        margin-bottom: 45px;
+        color: var(--white);
+
+        @include tablet-breakpoint {
+            font-size: 18px;
+            margin-bottom: 35px;
+        }
+    }
+}
+
+.banner-media {
+    display: flex;
+    gap: 20px;
+    flex-shrink: 0;
+
+    @include laptop-breakpoint {
+        flex-direction: column;
+    }
+
+    @include tablet-breakpoint {
+        flex-direction: row;
+    }
+
+    a {
+        flex-shrink: 0;
+        @include center(70px, 70px, 50%);
+        @include flex(flex, center, center, 0px);
+        background-color: var(--primary);
+        animation: grow 2s linear infinite;
+
+        @include tablet-breakpoint {
+            @include center(60px, 60px, 50%);
+        }
+
+        i {
+            font-size: 24px;
+            color: var(--white);
+
+            @include tablet-breakpoint {
+                font-size: 20px;
+            }
+        }
+    }
+
+    span {
+        display: block;
+        font-size: 24px;
+        font-weight: 500;
+        margin-bottom: 5px;
+        color: var(--white);
+
+        @include tablet-breakpoint {
+            font-size: 18px;
+        }
+    }
+
+    h3 {
+        font-size: 36px;
+        font-weight: 700;
+        line-height: 44px;
+        margin-bottom: 3px;
+        text-transform: uppercase;
+        color: var(--white);
+
+        @include tablet-breakpoint {
+            font-size: 30px;
+            line-height: 36px;
+        }
+    }
+
+    p {
+        font-size: 14px;
+        font-weight: 400;
+        text-transform: uppercase;
+        color: var(--white);
+
+        @include tablet-breakpoint {
+            font-size: 12px;
+        }
+    }
+}
+.banner-media-content {
+    width: 100%;
+    max-width: 170px;
+
+    @include mobile-breakpoint {
+        max-width: 150px;
+    }
+}
+
+//=======================================
+//          FEATURE PART STYLE
+//=======================================
+.feature-part {
+    margin-bottom: 100px;
+    @include grid-column(0px, 4);
+
+    @include desktop-breakpoint {
+        @include grid-column(0px, 2);
+    }
+
+    @include tablet-breakpoint {
+        margin-bottom: 80px;
+    }
+
+    @include mobile-breakpoint {
+        @include grid-column(0px, 1);
+        margin-bottom: 60px;
+    }
+}
+
+//=======================================
+//          ABOUT PART STYLE
+//=======================================
+.about-part {
+    margin-bottom: 80px;
+
+    @include mobile-breakpoint   {
+        margin-bottom: 60px;
+    }
+}
+
+.about-content {
+    width: 100%;
+    max-width: 550px;
+
+    @include tablet-breakpoint {
+        max-width: 100%;
+        margin-bottom: 50px;
+    }
+
+    h2 {
+        margin-bottom: 50px;
+
+        @include tablet-breakpoint {
+            margin-bottom: 20px;
+        }
+    }
+
+    p {
+        font-size: 18px;
+        line-height: 30px;
+        margin-bottom: 45px;
+    }
+}
+
+.about-media {
+    img {
+        width: 100%;
+        max-width: 550px;
+        border-radius: 4px;
+        margin-inline-start: auto;
+        display: block;
+    }
+}
+
+.about-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 580px;
+    gap: 30px;
+    padding: 36px 50px;
+    margin-left: -40px;
+    margin-top: -60px;
+    position: relative;
+    background-color: var(--white);
+
+    @include desktop-breakpoint {
+        margin: 0px;
+    }
+
+    @include tablet-breakpoint {
+        max-width: 100%;
+    }
+}
+
+.about-item {
+    text-align: center;
+
+    h4 {
+        font-size: 36px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    p {
+        font-size: 18px;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+}
+
+//=======================================
+//          APPLY PART STYLE
+//=======================================
+.apply-part {
+    margin-bottom: 180px;
+
+    @include laptop-breakpoint {
+        margin-bottom: 100px;
+    }
+
+    @include tablet-breakpoint   {
+        margin-bottom: 80px;
+    }
+
+    @include mobile-breakpoint   {
+        margin-bottom: 60px;
+    }
+
+    .apply-content {
+        width: 100%;
+        padding: 40px;
+        max-width: 740px;
+        margin: 0 auto;
+        background-color: var(--secondary);
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        color: var(--white);
+    }
+
+    p {
+        font-size: 18px;
+        line-height: 28px;
+        margin-bottom: 30px;
+        color: var(--white);
+
+        @include tablet-breakpoint {
+            font-size: 16px;
+            line-height: 26px;
+        }
+    }
+}
+
+//=======================================
+//          PRINCIPAL PART STYLE
+//=======================================
+.principal-part {
+    margin-bottom: 100px;
+    background-color: var(--primary-slate);
+
+    @include tablet-breakpoint   {
+        margin-bottom: 80px;
+    }
+
+    @include mobile-breakpoint   {
+        margin-bottom: 60px;
+    }
+}
+
+.principal-group {
+    gap: 120px;
+    padding-block: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    @include laptop-breakpoint {
+        gap: 60px;   
+    }
+
+    @include tablet-breakpoint {
+        flex-direction: column;
+    }
+
+    @include mobile-breakpoint {
+        gap: 30px;  
+        padding-block: 30px;
+    }
+}
+
+.principal-media {
+    flex-shrink: 0;
+    margin-top: -160px;
+
+    @include laptop-breakpoint {
+        margin-top: 0px;
+    }
+
+    img {
+        width: 450px;
+
+        @include laptop-breakpoint {
+            width: 300px;   
+        }
+
+        @include tablet-breakpoint {
+            width: 100%;
+        }
+    }
+}
+
+.principal-content {
+    h2 {
+        margin-bottom: 20px;
+    }
+
+    p {
+        font-size: 18px;
+        font-weight: 400;
+        line-height: 26px;
+        font-style: italic;
+        font-family: none;
+        margin-bottom: 30px;
+    }
+
+    dl {
+        position: relative;
+        padding-left: 50px;
+        margin-bottom: 0px;
+
+        &::before {
+            content: "";
+            width: 32px;
+            height: 1px;
+            display: inline-block;
+            position: absolute;
+            top: 18px;
+            left: 0px;
+            background-color: var(--secondary);
+        }
+
+        dt {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: capitalize;
+
+            @include mobile-breakpoint {
+                font-size: 20px;
+            }
+        }
+
+        dd {
+            font-size: 16px;
+            margin-bottom: 0px;
+            color: var(--primary);
+
+            @include mobile-breakpoint {
+                font-size: 14px;
+            }
+        }
+    }
+}
+
+//=======================================
+//          TEACHER PART STYLE
+//=======================================
+.teacher-part {
+    margin-bottom: 100px;
+
+    @include tablet-breakpoint   {
+        margin-bottom: 80px;
+    }
+
+    @include mobile-breakpoint   {
+        margin-bottom: 60px;
+    }
+
+    .teacher-card {
+        @include mobile-breakpoint {
+            width: 270px;
+        }
+    }
+}
+
+//=======================================
+//          EVENT PART STYLE
+//=======================================
+.event-part {
+    margin-bottom: 100px;
+
+    @include tablet-breakpoint   {
+        margin-bottom: 80px;
+    }
+
+    @include mobile-breakpoint   {
+        margin-bottom: 60px;
+    }
+
+    .event-card {
+        @include laptop-breakpoint {
+            width: 300px;
+        }
+    }
+}
+
+//=======================================
+//          SOCIAL PART STYLE
+//=======================================
+.social-part {
+    margin-bottom: 100px;
+    background-image: url('../../images/bg/social.jpg');
+    @include background-image;
+
+    @include tablet-breakpoint   {
+        margin-bottom: 80px;
+    }
+
+    @include mobile-breakpoint   {
+        margin-bottom: 60px;
+    }
+}
+
+.social-overlay {
+    padding: 80px 16px;
+    background: linear-gradient(rgba(#652600, 38%), rgba(#FA5E01, 68%));
+    text-align: center;
+
+    @include tablet-breakpoint {
+        padding: 60px 16px;
+    }
+
+    @include mobile-breakpoint {
+        padding: 40px 16px;
+    }
+
+    span {
+        width: 90px;
+        height: 3px;
+        margin-bottom: 10px;
+        display: inline-block;
+        background-color: var(--white);
+    }
+
+    h2 {
+        font-size: 42px;
+        margin-bottom: 10px;
+        color: var(--white);
+
+        @include mobile-breakpoint {
+            font-size: 28px;
+        }
+    }
+
+    p {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 45px;
+        color: var(--white);
+
+        @include mobile-breakpoint {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+    }
+
+    nav {
+        @include flex(flex, center, center, 60px);
+        flex-wrap: wrap;
+        
+        @include mobile-breakpoint {
+            gap: 24px;
+        }
+
+        a {
+            font-size: 80px;
+            color: var(--white);
+            @include transition-linear;
+
+            @include tablet-breakpoint {
+                font-size: 60px;
+            }
+
+            @include mobile-breakpoint {
+                font-size: 36px;
+            }
+
+            &:hover {
+                transform: translateY(-8px);
+            }
+        }
+    }
+}
+
+//=======================================
+//          GELLERY PART STYLE
+//=======================================
+.gallery-part {
+    margin-bottom: 100px;
+
+    @include tablet-breakpoint   {
+        margin-bottom: 80px;
+    }
+
+    @include mobile-breakpoint   {
+        margin-bottom: 60px;
+    }
+}

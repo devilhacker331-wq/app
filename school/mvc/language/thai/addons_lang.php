@@ -1,0 +1,23 @@
+<?php 
+$lang['panel_title'] = 'Addons';
+$lang['add_title'] = 'เพิ่มส่วนเสริม';
+$lang['addons_file'] = 'ไฟล์';
+$lang['addons_addons'] = 'Addons';
+$lang['addons_list'] = 'รายการ Addons';
+$lang['addons_slno'] = '#';
+$lang['addons_package_name'] = 'ชื่อแพ็กเกจ';
+$lang['addons_slug'] = 'กระสุน';
+$lang['addons_description'] = 'คำอธิบาย';
+$lang['addons_version'] = 'เวอร์ชัน';
+$lang['addons_author'] = 'ผู้เขียน';
+$lang['addons_files'] = 'ไฟล์';
+$lang['addons_preview_image'] = 'ภาพตัวอย่าง';
+$lang['addons_date'] = 'วันที่';
+$lang['addons_status'] = 'สถานะ';
+$lang['addons_action'] = 'หนังบู๊';
+$lang['addons_upload'] = 'ที่อัพโหลด';
+$lang['addons_delete'] = 'ลบ';
+$lang['addons_success'] = 'ประสบความสำเร็จ';
+$lang['addons_failed'] = 'ล้มเหลว';
+$lang['addons_file_browse'] = 'เรียกดูไฟล์';
+$lang['addons_clear'] = 'ชัดเจน';

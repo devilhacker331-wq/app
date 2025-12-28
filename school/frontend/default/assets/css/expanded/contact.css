@@ -1,0 +1,138 @@
+:root {
+  --red: #ff3838;
+  --blue: #1494a9;
+  --black: #000000;
+  --white: #ffffff;
+  --green: #11b76b;
+  --gray-1: #fafcff;
+  --gray-2: #f5f5f5;
+  --gray-3: #ececec;
+  --purple: #b12fad;
+  --orange: #e86121;
+  --yellow: #ffb100;
+  --indigo: #6610f2;
+  --body: #f8f7f6;
+  --line: #E6E6E6;
+  --border: #E3E2E1;
+  --primary: #FA5E01;
+  --secondary: #0C1028;
+  --text-black: #41403F;
+  --text-slate: #ECECEC;
+  --primary-slate: #FFF9F5;
+  --facebook: #3b5998;
+  --linkedin: #0e76a8;
+  --twitter: #00acee;
+  --google: #E60023;
+  --instagram: #F77737;
+  --whatsapp: #25D366;
+  --pinterest: #f0002a;
+  --youtube: #FF0000;
+}
+
+.contact-part {
+  padding-block: 100px;
+}
+@media (max-width: 991px) {
+  .contact-part {
+    padding-block: 80px;
+  }
+}
+@media (max-width: 767px) {
+  .contact-part {
+    padding-block: 60px;
+  }
+}
+
+.contact-describe {
+  max-width: 460px;
+}
+
+.contact-content {
+  width: 900px;
+  padding: 35px;
+  margin-top: 70px;
+  border-radius: 4px;
+  background-color: var(--white);
+}
+@media (max-width: 1199px) {
+  .contact-content {
+    width: 770px;
+    margin-top: 50px;
+  }
+}
+@media (max-width: 991px) {
+  .contact-content {
+    width: 100%;
+    margin-top: 30px;
+  }
+}
+.contact-content ul {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  gap: 20px;
+}
+.contact-content ul li {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 16px;
+}
+.contact-content ul li svg {
+  margin-top: 3px;
+}
+.contact-content ul li span {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  max-width: 380px;
+  color: var(--secondary);
+}
+
+.contact-map {
+  border: none;
+  width: 100%;
+  height: 400px;
+  border-radius: 4px;
+}
+
+.message-part {
+  margin-bottom: 100px;
+}
+@media (max-width: 991px) {
+  .message-part {
+    margin-bottom: 80px;
+  }
+}
+@media (max-width: 767px) {
+  .message-part {
+    margin-bottom: 60px;
+  }
+}
+
+.message-content {
+  border-radius: 4px;
+  padding: 45px 30px;
+  background: var(--white);
+}
+@media (max-width: 575px) {
+  .message-content {
+    padding: 35px 20px;
+  }
+}
+.message-content .section-title {
+  margin-bottom: 45px;
+}
+.message-content .row {
+  margin: 0px -18px;
+}
+.message-content .row > * {
+  padding: 0px 18px;
+}
+.message-content .section-btn.full {
+  margin-top: 40px;
+}

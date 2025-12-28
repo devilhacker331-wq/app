@@ -1,0 +1,115 @@
+.footer-part {
+    padding: 70px 0px;
+    background-color: var(--primary);
+
+    @include tablet-breakpoint {
+        padding: 60px 0px;
+    }
+}
+
+.footer-about {
+    margin-#{$end-direction}: 50px;
+
+    @include tablet-breakpoint {
+        margin-#{$end-direction}: 0px;
+        margin-bottom: 50px;
+    }
+
+    p {
+        font-size: 16px;
+        line-height: 28px;
+        margin-bottom: 36px;
+        color: var(--white);
+    }
+
+    ul {
+        li {
+            display: flex;
+            gap: 16px;
+
+            &:first-child {
+                margin-bottom: 24px;
+            }
+
+            svg {
+                flex-shrink: 0;
+                margin-top: 4px;
+            }
+
+            span {
+                font-size: 18px;
+                font-weight: 600;
+                line-height: 28px;
+                color: var(--white);
+            }
+        }
+    }
+}
+
+.footer-navs {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    @include mobile-breakpoint {
+        margin-bottom: 50px;
+    }
+
+    a {
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 28px;
+        width: fit-content;
+        text-transform: capitalize;
+        color: var(--white);
+        @include transition-linear;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.footer-social {
+    h4 {
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 28px;
+        margin-bottom: 24px;
+        text-transform: capitalize;
+        color: var(--white);
+    }
+
+    nav {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 24px;
+        margin-bottom: 48px;
+
+        @include tablet-breakpoint {
+            gap: 20px;
+        }
+
+        a {
+            font-size: 40px;
+            color: var(--white);
+            @include transition-linear;
+
+            @include tablet-breakpoint {
+               font-size: 30px;
+            }
+
+            &:hover {
+                transform: translateY(-5px);
+            }
+        }
+    }
+
+    p {
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 28px;
+        color: var(--white);
+    }
+}

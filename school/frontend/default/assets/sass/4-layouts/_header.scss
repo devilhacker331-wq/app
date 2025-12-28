@@ -1,0 +1,230 @@
+.header-part {
+    position: relative;
+    background-color: var(--white);
+    @include transition-linear;
+
+    &.active {
+        position: fixed;
+        z-index: 5;
+        top: 0px;
+        #{$start-direction}: 0px;
+        width: 100%;
+        box-shadow: 0px 8px 15px 0px rgba($black, 4%);
+    }
+}
+
+.header-content {
+    height: 74px;
+    @include flex(flex, center, space-between, 50px);
+
+    @include desktop-breakpoint {
+        gap: 24px;
+    }
+
+    @include desktop-breakpoint {
+        gap: 36px;
+    }
+
+    @include mobile-breakpoint {
+        gap: 24px;
+        height: 60px;
+    }
+}
+
+.header-logo {
+    @include laptop-breakpoint {
+        margin-inline-end: auto;
+    }
+
+    img {
+        width: 120px;
+
+        @include mobile-breakpoint {
+            width: 100px;
+        }
+    }
+}
+
+.header-menu {
+    @include flex(none, center, center, 0px);
+    flex-shrink: 0;
+    color: var(--primary);
+    background-color: var(--white);
+    border: 1px solid var(--primary);
+    @include center(32px, 32px, 6px);
+
+    @include laptop-breakpoint {
+        display: flex;
+    }
+
+    i {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--primary);
+    }
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 56px;
+
+    @include mobile-breakpoint {
+        position: fixed;
+        z-index: 5;
+        top: 0px;
+        #{$start-direction}: 0px;
+        transform: translateX(-100%);
+        width: 100%;
+        max-width: 270px;
+        height: 100vh;
+        padding: 20px;
+        gap: 40px;
+        overflow-y: auto;
+        flex-direction: column;
+        align-items: flex-start;
+        background-color: var(--white);
+        @include transition-linear;
+
+        &.active {
+            transform: translateX(0%);
+            box-shadow: 7px 0px 15px 0px rgba($black, 10%);
+        }
+    }
+}
+
+.header-nav-group {
+    display: none;
+
+    @include mobile-breakpoint {
+        width: 100%;
+        @include flex(flex, center, space-between, 10px);
+    }
+}
+
+.header-nav-logo {
+    img {
+        width: 100px;
+    }
+}
+
+.header-nav-close {
+    font-size: 8px;
+    font-weight: 900;
+    @include center(32px, 32px, 6px);
+    @include transition-linear;
+
+    &:hover {
+        color: var(--white);
+        background-color: var(--primary);
+    }
+}
+
+.header-nav-list {
+    @include flex(flex, center, center, 30px 40px);
+
+    @include desktop-breakpoint {
+        gap: 24px 30px;
+    }
+
+    @include laptop-breakpoint {
+        position: absolute;
+        flex-wrap: wrap;
+        z-index: 5;
+        top: 70px;
+        #{$start-direction}: 0px;
+        transform: scaleY(0);
+        transform-origin: top;
+        width: 100%;
+        padding: 20px;
+        background-color: var(--white);
+        border-top: 1px solid var(--gray-2);
+        box-shadow: 0px 8px 15px 0px rgba($black, 4%);
+        @include transition-linear;
+
+        &.active {
+            transform: scaleY(1);
+        }
+    }
+
+    @include mobile-breakpoint {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+    }
+}
+
+.header-nav-item {
+    line-height: 0px;
+
+    &.active {
+        .header-nav-link {
+            color: var(--primary);
+        }
+    }
+}
+
+.header-nav-link {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 25px;
+    position: relative;
+    text-transform: capitalize;
+    color: var(--secondary);
+    @include transition-linear;
+
+    &:hover {
+        &::before {
+            width: 100%;
+        }
+    }
+
+    &::before {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        #{$start-direction}: 0px;
+        width: 0%;
+        height: 1px;
+        background-color: var(--primary);
+        @include transition-linear;
+    }
+}
+
+.header-action-btn {
+    width: 85px;
+    height: 120px;
+    flex-shrink: 0;
+    background-color: var(--primary);
+    -webkit-mask-image: url("/images/badge.png");
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: bottom;
+    -webkit-mask-size: cover;
+    @include flex(flex, center, center, 4px);
+    flex-direction: column;
+    position: relative;
+    z-index: 5;
+
+    @include mobile-breakpoint {
+        width: 75px;
+        height: 105px;
+        gap: 2px;
+    }
+
+    img {
+        height: 24px;
+    }
+
+    span {
+        font-size: 18px;
+        font-weight: 600;
+        display: block;
+        white-space: nowrap;
+        text-transform: capitalize;
+        color: var(--white);
+
+        @include mobile-breakpoint {
+            font-size: 14px;
+        }
+    }
+}

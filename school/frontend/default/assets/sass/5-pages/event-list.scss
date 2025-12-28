@@ -1,0 +1,25 @@
+@import "../1-helpers/directions";
+@import "../1-helpers/breakpoints";
+@import "../1-helpers/mixins";
+
+.event-part {
+    padding-top: 80px;
+    padding-bottom: 40px;
+
+    @include laptop-breakpoint {
+        padding-top: 60px;
+    }
+
+    @include tablet-breakpoint {
+        padding-top: 40px;
+        padding-bottom: 20px;
+    }
+}
+
+.event-card {
+    margin-bottom: 50px;
+
+    @include tablet-breakpoint {
+        margin-bottom: 30px;
+    }
+}

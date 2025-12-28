@@ -1,0 +1,95 @@
+@import "../1-helpers/directions";
+@import "../1-helpers/breakpoints";
+@import "../1-helpers/colors";
+@import "../1-helpers/mixins";
+
+
+//=======================================
+//       EVENT DETAILS PART STYLE
+//=======================================
+.blog-part {
+    padding-block: 70px;
+
+    @include laptop-breakpoint {
+        padding-block: 50px;
+    }
+
+    h2 {
+        margin-bottom: 12px;
+    }
+}
+
+.blog-group {
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--line);
+}
+
+.blog-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 24px;
+    padding-bottom: 30px;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--line);
+
+    button {
+        height: 36px;
+        border-radius: 4px;
+        padding-inline: 20px;
+        @include font(16px, 600);
+        text-transform: capitalize;
+        color: var(--white);
+        background-color: var(--primary);
+    }
+
+    span {
+        white-space: nowrap;
+        @include font(18px, 400);
+    }
+}
+
+.blog-details {
+    width: 100%;
+    max-width: 740px;
+    margin: 0 auto;
+
+    img {
+        width: 100%;
+        display: block;
+        border-radius: 4px;
+        margin-bottom: 40px;
+    }
+
+    p {
+        span {
+            margin-top: 25px;
+        }
+    }
+
+    h3 {
+        margin-top: 30px;
+        @include font(18px, 600);
+    }
+}
+
+//=======================================
+//       RECENT EVENT PART STYLE
+//=======================================
+.recent-part {
+    margin-bottom: 80px;
+
+    @include laptop-breakpoint {
+        margin-bottom: 60px;
+    }
+
+    @include tablet-breakpoint {
+        margin-bottom: 40px;
+    }
+}
+
+.blog-card {
+    @include tablet-breakpoint {
+        width: 290px;
+    }
+}

@@ -1,0 +1,23 @@
+<?php 
+$lang['panel_title'] = 'Addons';
+$lang['add_title'] = 'Tambahkan addons';
+$lang['addons_file'] = 'Mengajukan';
+$lang['addons_addons'] = 'Addons';
+$lang['addons_list'] = 'Daftar Addons';
+$lang['addons_slno'] = '#';
+$lang['addons_package_name'] = 'Nama paket';
+$lang['addons_slug'] = 'Siput';
+$lang['addons_description'] = 'Deskripsi';
+$lang['addons_version'] = 'Versi: kapan';
+$lang['addons_author'] = 'Penulis';
+$lang['addons_files'] = 'File';
+$lang['addons_preview_image'] = 'Gambar pratinjau';
+$lang['addons_date'] = 'Tanggal';
+$lang['addons_status'] = 'Status';
+$lang['addons_action'] = 'Tindakan';
+$lang['addons_upload'] = 'Unggah';
+$lang['addons_delete'] = 'Menghapus';
+$lang['addons_success'] = 'Keberhasilan';
+$lang['addons_failed'] = 'Gagal';
+$lang['addons_file_browse'] = 'Telusuri File';
+$lang['addons_clear'] = 'Bersih';

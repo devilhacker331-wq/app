@@ -1,0 +1,31 @@
+.notice-card {
+    padding: 24px;
+    background-color: var(--white);
+
+    h4 {
+        margin-bottom: 24px;
+
+        a {
+            color: var(--secondary);
+        }
+
+        &::after {
+            content: "";
+            width: 90px;
+            height: 2px;
+            display: block;
+            margin-top: 15px;
+            background-color: var(--primary);
+        }
+    }
+
+    p {
+        margin-bottom: 18px;
+    }
+
+    span {
+        display: block;
+        font-size: 14px;
+        font-weight: 400;
+    }
+}

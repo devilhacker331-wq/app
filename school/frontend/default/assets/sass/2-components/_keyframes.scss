@@ -1,0 +1,6 @@
+@keyframes grow {
+    0% { box-shadow: 0px 0px 0px 0px rgba(250, 92, 1, 0.7), 0px 0px 0px 0px rgba(250, 92, 1, 0.7) }
+    30% { box-shadow: 0px 0px 0px 25px rgba(255, 127, 0, 0.0), 0px 0px 0px 0px rgba(250, 92, 1, 0.7) }
+    60% { box-shadow: 0px 0px 0px 25px rgba(255, 127, 0, 0.0), 0px 0px 0px 20px rgba(255, 127, 0, 0.0) }
+    100% { box-shadow: 0px 0px 0px 0px rgba(255, 127, 0, 0.0), 0px 0px 0px 20px rgba(255, 127, 0, 0.0) }
+}

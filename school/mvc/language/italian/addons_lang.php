@@ -1,0 +1,23 @@
+<?php 
+$lang['panel_title'] = 'Addons';
+$lang['add_title'] = 'Aggiungi un addons';
+$lang['addons_file'] = 'File';
+$lang['addons_addons'] = 'Addons';
+$lang['addons_list'] = 'Elenco dei componenti aggiuntivi';
+$lang['addons_slno'] = '#';
+$lang['addons_package_name'] = 'Nome del pacchetto';
+$lang['addons_slug'] = 'Slug';
+$lang['addons_description'] = 'Descrizione';
+$lang['addons_version'] = 'Versione';
+$lang['addons_author'] = 'Autore';
+$lang['addons_files'] = 'File';
+$lang['addons_preview_image'] = 'Anteprima immagine';
+$lang['addons_date'] = 'Data';
+$lang['addons_status'] = 'Stato';
+$lang['addons_action'] = 'Azione';
+$lang['addons_upload'] = 'Caricare';
+$lang['addons_delete'] = 'Elimina';
+$lang['addons_success'] = 'Successo';
+$lang['addons_failed'] = 'Fallito';
+$lang['addons_file_browse'] = 'File Browse';
+$lang['addons_clear'] = 'Chiaro';

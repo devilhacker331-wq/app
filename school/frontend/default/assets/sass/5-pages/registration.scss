@@ -1,0 +1,146 @@
+@import "../1-helpers/directions";
+@import "../1-helpers/breakpoints";
+@import "../1-helpers/mixins";
+
+.register-banner {
+    background-image: url('../../images/bg/register.jpg');
+    @include background-image;
+}
+
+.register-content {
+    width: 100%;
+    padding: 100px 0px;
+    max-width: 500px;
+
+    @include tablet-breakpoint {
+        padding: 80px 0px;
+    }
+
+    @include mobile-breakpoint {
+        padding: 60px 0px;
+    }
+
+    span {
+        display: block;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 22px;
+        margin-bottom: 35px;
+        padding-top: 10px;
+        position: relative;
+        text-transform: uppercase;
+        color: var(--white);
+
+        @include laptop-breakpoint {
+            margin-bottom: 30px;
+        }
+
+        @include mobile-breakpoint {
+            display: inline-block;
+        }
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: 0px;
+            #{$start-direction}: 0px;
+            width: 34px;
+            height: 2px;
+            background-color: var(--white);
+        }
+    }
+
+    h1 {
+        font-size: 52px;
+        color: var(--white);
+        margin-bottom: 35px;
+        text-transform: capitalize;
+    }
+
+    p {
+        font-size: 20px;
+        font-weight: 400;
+        line-height: 30px;
+        color: var(--white);
+
+        @include mobile-breakpoint {
+            font-size: 16px;
+            line-height: 25px;
+        }
+    }
+}
+
+.register-part {
+    padding-block: 100px;
+
+    @include laptop-breakpoint {
+        padding-block: 80px;
+    }
+
+    @include tablet-breakpoint {
+        padding-block: 60px;
+    }
+}
+
+.register-form {
+    border-radius: 4px;
+    background-color: #ffffff;
+
+    .col {
+        margin-bottom: 24px;
+
+        &.position-relative {
+            i {
+                position: absolute;
+                bottom: 18px;
+                right: 24px;
+                font-size: 14px;
+            }
+        }
+    }
+}
+
+.register-navs {
+    width: 100%;
+    height: 60px;
+    max-width: 450px;
+    display: flex;
+    flex-wrap: nowrap;
+    border: 1px solid var(--primary);
+
+    @include mobile-breakpoint {
+        max-width: 100%;
+        height: 140px;
+        flex-direction: column;
+    }
+
+    button {
+        width: 100%;
+        height: 100%;
+        font-size: 20px;
+        font-weight: 600;
+        white-space: nowrap;
+        text-transform: capitalize;
+        background-color: var(--white);
+        color: var(--primary);
+        @include transition-linear;
+
+        &.active {
+            color: var(--white);
+            background-color: var(--primary);
+        }
+    }
+}
+
+.register-tab-content {
+    padding: 48px;
+
+    @include mobile-breakpoint {
+        padding: 25px;
+    }
+
+    .section-title {
+        margin-bottom: 35px;
+    }
+}
+

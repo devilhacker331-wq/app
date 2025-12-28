@@ -1,0 +1,40 @@
+.feature-card {
+    padding: 42px 30px;
+    text-align: center;
+    color: var(--white);
+    background-color: var(--secondary);
+
+    @media (min-width: 1200px) {
+        &:nth-child(even) {
+            background-color: var(--primary);
+        }
+    }
+
+    @include custom-breakpoint(576px, 1199px) {
+        &:nth-child(1),
+        &:nth-child(4) {
+            background-color: var(--primary);
+        }
+    }
+
+    @include mobile-breakpoint {
+        &:nth-child(2),
+        &:nth-child(4) {
+            background-color: var(--primary);
+        }
+    }
+
+    i {
+        font-size: 45px;
+        margin-bottom: 36px;
+    }
+
+    p {
+        width: 100%;
+        margin-inline: auto;
+        max-width: 280px;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: 28px;
+    }
+}

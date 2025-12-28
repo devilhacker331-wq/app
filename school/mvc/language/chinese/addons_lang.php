@@ -1,0 +1,23 @@
+<?php 
+$lang['panel_title'] = '插件';
+$lang['add_title'] = '添加插件';
+$lang['addons_file'] = '文件';
+$lang['addons_addons'] = '插件';
+$lang['addons_list'] = '插件列表';
+$lang['addons_slno'] = '＃';
+$lang['addons_package_name'] = '包裹名字';
+$lang['addons_slug'] = 'ug';
+$lang['addons_description'] = '描述';
+$lang['addons_version'] = '版';
+$lang['addons_author'] = '作者';
+$lang['addons_files'] = '档案';
+$lang['addons_preview_image'] = '预览图片';
+$lang['addons_date'] = '日期';
+$lang['addons_status'] = '状态';
+$lang['addons_action'] = '行动';
+$lang['addons_upload'] = '上载';
+$lang['addons_delete'] = '删除';
+$lang['addons_success'] = '成功';
+$lang['addons_failed'] = '失败的';
+$lang['addons_file_browse'] = '文件浏览';
+$lang['addons_clear'] = '明确';
