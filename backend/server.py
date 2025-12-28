@@ -18,7 +18,22 @@ from models import (
     Teacher, TeacherCreate,
     Student, StudentCreate,
     Parent, ParentCreate,
-    Settings, SettingsCreate
+    Settings, SettingsCreate,
+    # Phase 2
+    TimetableEntry, TimetableEntryCreate, DayOfWeek,
+    # Phase 3
+    Attendance, AttendanceCreate, AttendanceStatus,
+    ExamType, ExamTypeCreate,
+    ExamSchedule, ExamScheduleCreate,
+    MarksEntry, MarksEntryCreate,
+    GradeRule, GradeRuleCreate,
+    # Phase 4
+    FeeType, FeeTypeCreate,
+    FeeStructure, FeeStructureCreate,
+    Invoice, InvoiceCreate, InvoiceStatus,
+    Payment, PaymentCreate, PaymentMethod,
+    Income, IncomeCreate, IncomeCategory,
+    Expense, ExpenseCreate, ExpenseCategory
 )
 from auth import get_password_hash, verify_password, create_access_token, decode_access_token
 
