@@ -223,3 +223,263 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+
+# ============ PHASE 2: Timetable Models ============
+
+class DayOfWeek(str, Enum):
+    MONDAY = "monday"
+    TUESDAY = "tuesday"
+    WEDNESDAY = "wednesday"
+    THURSDAY = "thursday"
+    FRIDAY = "friday"
+    SATURDAY = "saturday"
+    SUNDAY = "sunday"
+
+class TimetableEntryBase(BaseModel):
+    class_id: str
+    section_id: str
+    day: DayOfWeek
+    period_number: int  # 1, 2, 3, etc.
+    start_time: str  # "09:00"
+    end_time: str  # "10:00"
+    subject_id: str
+    teacher_id: str
+    room_number: Optional[str] = None
+
+class TimetableEntryCreate(TimetableEntryBase):
+    pass
+
+class TimetableEntry(TimetableEntryBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# ============ PHASE 3: Attendance Models ============
+
+class AttendanceStatus(str, Enum):
+    PRESENT = "present"
+    ABSENT = "absent"
+    LATE = "late"
+    EXCUSED = "excused"
+    HALF_DAY = "half_day"
+
+class AttendanceBase(BaseModel):
+    student_id: str
+    class_id: str
+    section_id: str
+    date: datetime
+    status: AttendanceStatus
+    subject_id: Optional[str] = None  # For subject-wise attendance
+    remarks: Optional[str] = None
+    marked_by: str  # teacher user_id
+
+class AttendanceCreate(AttendanceBase):
+    pass
+
+class Attendance(AttendanceBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# Exam Models
+class ExamTypeBase(BaseModel):
+    name: str  # "Midterm", "Final", "Quiz", "Unit Test"
+    description: Optional[str] = None
+    weightage: Optional[float] = None  # Percentage contribution to final grade
+
+class ExamTypeCreate(ExamTypeBase):
+    pass
+
+class ExamType(ExamTypeBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ExamScheduleBase(BaseModel):
+    exam_type_id: str
+    name: str  # "Midterm Exam 2024"
+    class_id: str
+    section_id: Optional[str] = None
+    subject_id: str
+    exam_date: datetime
+    start_time: str  # "09:00"
+    end_time: str  # "12:00"
+    total_marks: float
+    pass_marks: float
+    room_number: Optional[str] = None
+    instructions: Optional[str] = None
+
+class ExamScheduleCreate(ExamScheduleBase):
+    pass
+
+class ExamSchedule(ExamScheduleBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class MarksEntryBase(BaseModel):
+    exam_schedule_id: str
+    student_id: str
+    marks_obtained: float
+    remarks: Optional[str] = None
+    is_absent: bool = False
+    entered_by: str  # teacher user_id
+
+class MarksEntryCreate(MarksEntryBase):
+    pass
+
+class MarksEntry(MarksEntryBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class GradeRuleBase(BaseModel):
+    name: str  # "A+", "A", "B", etc.
+    min_percentage: float
+    max_percentage: float
+    grade_point: Optional[float] = None
+    description: Optional[str] = None
+
+class GradeRuleCreate(GradeRuleBase):
+    pass
+
+class GradeRule(GradeRuleBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# ============ PHASE 4: Financial Models ============
+
+class FeeTypeBase(BaseModel):
+    name: str  # "Tuition", "Transport", "Library", "Lab", "Sports"
+    description: Optional[str] = None
+    is_mandatory: bool = True
+
+class FeeTypeCreate(FeeTypeBase):
+    pass
+
+class FeeType(FeeTypeBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class FeeStructureBase(BaseModel):
+    class_id: str
+    school_year_id: str
+    fee_type_id: str
+    amount: float
+    due_date: Optional[datetime] = None
+    frequency: str = "annual"  # "annual", "monthly", "quarterly", "semester"
+
+class FeeStructureCreate(FeeStructureBase):
+    pass
+
+class FeeStructure(FeeStructureBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class InvoiceStatus(str, Enum):
+    PENDING = "pending"
+    PAID = "paid"
+    PARTIALLY_PAID = "partially_paid"
+    OVERDUE = "overdue"
+    CANCELLED = "cancelled"
+
+class InvoiceBase(BaseModel):
+    invoice_number: str
+    student_id: str
+    class_id: str
+    school_year_id: str
+    issue_date: datetime
+    due_date: datetime
+    total_amount: float
+    paid_amount: float = 0.0
+    status: InvoiceStatus = InvoiceStatus.PENDING
+    items: List[dict] = []  # [{fee_type_id, fee_type_name, amount}]
+    remarks: Optional[str] = None
+
+class InvoiceCreate(InvoiceBase):
+    pass
+
+class Invoice(InvoiceBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PaymentMethod(str, Enum):
+    CASH = "cash"
+    CARD = "card"
+    BANK_TRANSFER = "bank_transfer"
+    CHEQUE = "cheque"
+    ONLINE = "online"
+    STRIPE = "stripe"
+
+class PaymentBase(BaseModel):
+    invoice_id: str
+    student_id: str
+    amount: float
+    payment_date: datetime
+    payment_method: PaymentMethod
+    transaction_id: Optional[str] = None
+    remarks: Optional[str] = None
+    received_by: str  # user_id of accountant/admin
+
+class PaymentCreate(PaymentBase):
+    pass
+
+class Payment(PaymentBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class IncomeCategory(str, Enum):
+    FEE = "fee"
+    DONATION = "donation"
+    GRANT = "grant"
+    OTHER = "other"
+
+class IncomeBase(BaseModel):
+    category: IncomeCategory
+    amount: float
+    date: datetime
+    description: str
+    reference_id: Optional[str] = None  # invoice_id or payment_id
+    received_by: str  # user_id
+
+class IncomeCreate(IncomeBase):
+    pass
+
+class Income(IncomeBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ExpenseCategory(str, Enum):
+    SALARY = "salary"
+    MAINTENANCE = "maintenance"
+    UTILITIES = "utilities"
+    SUPPLIES = "supplies"
+    TRANSPORT = "transport"
+    OTHER = "other"
+
+class ExpenseBase(BaseModel):
+    category: ExpenseCategory
+    amount: float
+    date: datetime
+    description: str
+    vendor: Optional[str] = None
+    invoice_number: Optional[str] = None
+    approved_by: str  # user_id
+
+class ExpenseCreate(ExpenseBase):
+    pass
+
+class Expense(ExpenseBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
