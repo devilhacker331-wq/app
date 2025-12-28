@@ -1,30 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { PlusIcon, PhotoIcon } from '@heroicons/react/24/outline';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { Badge } from '../components/ui/badge';
+import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useToast } from '../hooks/use-toast';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const TeachersManagement = () => {
   const { token } = useAuth();
+  const { toast } = useToast();
   const [teachers, setTeachers] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [photoFile, setPhotoFile] = useState(null);
   const [formData, setFormData] = useState({
-    user_id: '',
+    employee_id: '',
     name: '',
-    designation: '',
-    qualification: '',
-    gender: '',
-    dob: '',
-    joining_date: '',
-    phone: '',
     email: '',
-    address: '',
-    photo: '',
-    salary: ''
+    phone: '',
+    qualification: '',
+    specialization: '',
+    date_of_joining: '',
+    subject_ids: [],
+    photo_url: ''
   });
 
   useEffect(() => {
@@ -33,274 +41,255 @@ const TeachersManagement = () => {
 
   const fetchData = async () => {
     try {
-      const [teachersRes, usersRes] = await Promise.all([
-        axios.get(`${API_URL}/api/teachers`, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(`${API_URL}/api/users?role=teacher`, { headers: { Authorization: `Bearer ${token}` } })
+      const [teachersRes, subjectsRes] = await Promise.all([
+        fetch(`${BACKEND_URL}/api/teachers`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${BACKEND_URL}/api/subjects`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
-      setTeachers(teachersRes.data);
-      setUsers(usersRes.data);
+      if (teachersRes.ok) setTeachers(await teachersRes.json());
+      if (subjectsRes.ok) setSubjects(await subjectsRes.json());
     } catch (error) {
-      console.error('Error fetching data:', error);
+      toast({ title: 'Error', description: 'Failed to fetch data', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePhotoUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setUploadingPhoto(true);
-    const formData = new FormData();
-    formData.append('file', file);
-
+  const handlePhotoUpload = async (file) => {
     try {
-      const response = await axios.post(`${API_URL}/api/upload`, formData, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch(`${BACKEND_URL}/api/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
       });
-      setFormData(prev => ({ ...prev, photo: response.data.url }));
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.url;
+      } else {
+        toast({ title: 'Error', description: 'Failed to upload photo', variant: 'destructive' });
+        return null;
+      }
     } catch (error) {
-      console.error('Error uploading photo:', error);
-      alert('Error uploading photo');
-    } finally {
-      setUploadingPhoto(false);
+      toast({ title: 'Error', description: 'Failed to upload photo', variant: 'destructive' });
+      return null;
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_URL}/api/teachers`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
+      let photoUrl = formData.photo_url;
+      
+      if (photoFile) {
+        photoUrl = await handlePhotoUpload(photoFile);
+        if (!photoUrl) return;
+      }
+
+      const response = await fetch(`${BACKEND_URL}/api/teachers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ ...formData, photo_url: photoUrl })
       });
-      setShowModal(false);
-      setFormData({
-        user_id: '', name: '', designation: '', qualification: '', gender: '',
-        dob: '', joining_date: '', phone: '', email: '', address: '', photo: '', salary: ''
-      });
-      fetchData();
+
+      if (response.ok) {
+        toast({ title: 'Success', description: 'Teacher created successfully' });
+        setDialogOpen(false);
+        setFormData({
+          employee_id: '',
+          name: '',
+          email: '',
+          phone: '',
+          qualification: '',
+          specialization: '',
+          date_of_joining: '',
+          subject_ids: [],
+          photo_url: ''
+        });
+        setPhotoFile(null);
+        fetchData();
+      } else {
+        const error = await response.json();
+        toast({ title: 'Error', description: error.detail || 'Failed to create teacher', variant: 'destructive' });
+      }
     } catch (error) {
-      console.error('Error creating teacher:', error);
-      alert('Error creating teacher');
+      toast({ title: 'Error', description: 'Failed to create teacher', variant: 'destructive' });
     }
   };
 
+  const getSubjectsByIds = (subjectIds) => {
+    if (!subjectIds || subjectIds.length === 0) return [];
+    return subjects.filter(s => subjectIds.includes(s.id));
+  };
+
+  const filteredTeachers = teachers.filter(teacher =>
+    teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    teacher.employee_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    teacher.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading) {
-    return <div className="flex items-center justify-center h-64">Loading...</div>;
+    return <div className="flex justify-center items-center h-64">Loading...</div>;
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Teachers</h2>
-        <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          <PlusIcon className="w-5 h-5 mr-2" />
-          Add Teacher
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {teachers.map((teacher) => (
-          <div key={teacher.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
-            <div className="flex items-start space-x-4">
-              <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                {teacher.photo ? (
-                  <img src={`${API_URL}${teacher.photo}`} alt={teacher.name} className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-2xl text-gray-500">{teacher.name.charAt(0)}</span>
-                )}
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg">{teacher.name}</h3>
-                <p className="text-sm text-gray-600">{teacher.designation || 'Teacher'}</p>
-                <p className="text-sm text-gray-500 mt-1">{teacher.email}</p>
-                <p className="text-sm text-gray-500">{teacher.phone}</p>
-              </div>
-            </div>
-            {teacher.qualification && (
-              <div className="mt-3 pt-3 border-t">
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">Qualification:</span> {teacher.qualification}
-                </p>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Add Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
-          <div className="bg-white rounded-xl p-6 w-full max-w-2xl m-4">
-            <h3 className="text-xl font-bold mb-4">Add Teacher</h3>
-            <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">User Account</label>
-                  <select
-                    value={formData.user_id}
-                    onChange={(e) => {
-                      const user = users.find(u => u.id === e.target.value);
-                      setFormData({ 
-                        ...formData, 
-                        user_id: e.target.value,
-                        name: user?.name || '',
-                        email: user?.email || '',
-                        phone: user?.phone || ''
-                      });
-                    }}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900">Teachers</h2>
+          <p className="text-gray-600 mt-1">Manage teaching staff and their subjects</p>
+        </div>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="flex items-center gap-2">
+              <PlusIcon className="w-5 h-5" />
+              Add Teacher
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Add New Teacher</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="employee_id">Employee ID</Label>
+                  <Input
+                    id="employee_id"
+                    placeholder="e.g., EMP001"
+                    value={formData.employee_id}
+                    onChange={(e) => setFormData({ ...formData, employee_id: e.target.value })}
                     required
-                  >
-                    <option value="">Select User</option>
-                    {users.map((user) => (
-                      <option key={user.id} value={user.id}>{user.name} ({user.username})</option>
-                    ))}
-                  </select>
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                  <input
-                    type="text"
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="Teacher name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Designation</label>
-                  <input
-                    type="text"
-                    value={formData.designation}
-                    onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Qualification</label>
-                  <input
-                    type="text"
-                    value={formData.qualification}
-                    onChange={(e) => setFormData({ ...formData, qualification: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-                  <select
-                    value={formData.gender}
-                    onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-                  <input
-                    type="date"
-                    value={formData.dob}
-                    onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Joining Date</label>
-                  <input
-                    type="date"
-                    value={formData.joining_date}
-                    onChange={(e) => setFormData({ ...formData, joining_date: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
                     type="email"
+                    placeholder="teacher@email.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Salary</label>
-                  <input
-                    type="number"
-                    value={formData.salary}
-                    onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    placeholder="Phone number"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    required
                   />
                 </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                  <textarea
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                    rows="2"
+                <div>
+                  <Label htmlFor="qualification">Qualification</Label>
+                  <Input
+                    id="qualification"
+                    placeholder="e.g., M.Sc in Mathematics"
+                    value={formData.qualification}
+                    onChange={(e) => setFormData({ ...formData, qualification: e.target.value })}
+                    required
                   />
                 </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Photo</label>
-                  <div className="flex items-center space-x-4">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePhotoUpload}
-                      className="hidden"
-                      id="photo-upload"
-                    />
-                    <label
-                      htmlFor="photo-upload"
-                      className="flex items-center px-4 py-2 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200"
-                    >
-                      <PhotoIcon className="w-5 h-5 mr-2" />
-                      {uploadingPhoto ? 'Uploading...' : 'Upload Photo'}
-                    </label>
-                    {formData.photo && (
-                      <img src={`${API_URL}${formData.photo}`} alt="Preview" className="w-16 h-16 rounded-lg object-cover" />
-                    )}
-                  </div>
+                <div>
+                  <Label htmlFor="specialization">Specialization</Label>
+                  <Input
+                    id="specialization"
+                    placeholder="e.g., Mathematics"
+                    value={formData.specialization}
+                    onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="date_of_joining">Date of Joining</Label>
+                  <Input
+                    id="date_of_joining"
+                    type="date"
+                    value={formData.date_of_joining}
+                    onChange={(e) => setFormData({ ...formData, date_of_joining: e.target.value })}
+                    required
+                  />
                 </div>
               </div>
-              <div className="flex gap-2 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Create
-                </button>
+              <div>
+                <Label htmlFor="photo">Photo</Label>
+                <Input
+                  id="photo"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setPhotoFile(e.target.files[0])}
+                />
               </div>
+              <Button type="submit" className="w-full">Add Teacher</Button>
             </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>All Teachers</CardTitle>
+          <div className="relative mt-4">
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Input
+              placeholder="Search by name, employee ID, or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
-        </div>
-      )}
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Photo</TableHead>
+                <TableHead>Employee ID</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Qualification</TableHead>
+                <TableHead>Specialization</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredTeachers.map((teacher) => (
+                <TableRow key={teacher.id}>
+                  <TableCell>
+                    <Avatar>
+                      <AvatarImage src={teacher.photo_url} alt={teacher.name} />
+                      <AvatarFallback>{teacher.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                  </TableCell>
+                  <TableCell className="font-medium">{teacher.employee_id}</TableCell>
+                  <TableCell>{teacher.name}</TableCell>
+                  <TableCell>{teacher.email}</TableCell>
+                  <TableCell>{teacher.phone}</TableCell>
+                  <TableCell>{teacher.qualification}</TableCell>
+                  <TableCell>{teacher.specialization || 'N/A'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };
