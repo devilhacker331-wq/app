@@ -675,6 +675,803 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
     
     return stats
 
+# ============ File Upload Routes ============
+
+# Create uploads directory
+UPLOAD_DIR = ROOT_DIR / "uploads"
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+@api_router.post("/upload")
+async def upload_file(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Upload a file (images, documents)"""
+    # Validate file type
+    allowed_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.pdf', '.doc', '.docx'}
+    file_ext = Path(file.filename).suffix.lower()
+    
+    if file_ext not in allowed_extensions:
+        raise HTTPException(status_code=400, detail="File type not allowed")
+    
+    # Generate unique filename
+    unique_filename = f"{uuid_lib.uuid4()}{file_ext}"
+    file_path = UPLOAD_DIR / unique_filename
+    
+    # Save file
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    # Return URL
+    file_url = f"/api/uploads/{unique_filename}"
+    return {"url": file_url, "filename": unique_filename}
+
+# ============ PHASE 2: Timetable Routes ============
+
+@api_router.post("/timetable", response_model=TimetableEntry)
+async def create_timetable_entry(
+    entry: TimetableEntryCreate,
+    current_user: User = Depends(require_role([UserRole.ADMIN]))
+):
+    """Create timetable entry"""
+    entry_obj = TimetableEntry(**entry.model_dump())
+    doc = entry_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    
+    await db.timetable.insert_one(doc)
+    return entry_obj
+
+@api_router.get("/timetable", response_model=List[TimetableEntry])
+async def get_timetable(
+    class_id: Optional[str] = None,
+    section_id: Optional[str] = None,
+    teacher_id: Optional[str] = None,
+    day: Optional[DayOfWeek] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get timetable entries"""
+    query = {}
+    if class_id:
+        query["class_id"] = class_id
+    if section_id:
+        query["section_id"] = section_id
+    if teacher_id:
+        query["teacher_id"] = teacher_id
+    if day:
+        query["day"] = day
+    
+    entries = await db.timetable.find(query, {"_id": 0}).sort([("day", 1), ("period_number", 1)]).to_list(1000)
+    
+    for entry in entries:
+        if isinstance(entry.get('created_at'), str):
+            entry['created_at'] = datetime.fromisoformat(entry['created_at'])
+        if isinstance(entry.get('updated_at'), str):
+            entry['updated_at'] = datetime.fromisoformat(entry['updated_at'])
+    
+    return [TimetableEntry(**entry) for entry in entries]
+
+@api_router.put("/timetable/{entry_id}", response_model=TimetableEntry)
+async def update_timetable_entry(
+    entry_id: str,
+    updates: dict,
+    current_user: User = Depends(require_role([UserRole.ADMIN]))
+):
+    """Update timetable entry"""
+    updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.timetable.update_one({"id": entry_id}, {"$set": updates})
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Timetable entry not found")
+    
+    entry = await db.timetable.find_one({"id": entry_id}, {"_id": 0})
+    
+    if isinstance(entry.get('created_at'), str):
+        entry['created_at'] = datetime.fromisoformat(entry['created_at'])
+    if isinstance(entry.get('updated_at'), str):
+        entry['updated_at'] = datetime.fromisoformat(entry['updated_at'])
+    
+    return TimetableEntry(**entry)
+
+@api_router.delete("/timetable/{entry_id}")
+async def delete_timetable_entry(
+    entry_id: str,
+    current_user: User = Depends(require_role([UserRole.ADMIN]))
+):
+    """Delete timetable entry"""
+    result = await db.timetable.delete_one({"id": entry_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Timetable entry not found")
+    
+    return {"message": "Timetable entry deleted successfully"}
+
+# ============ PHASE 3: Attendance Routes ============
+
+@api_router.post("/attendance", response_model=Attendance)
+async def mark_attendance(
+    attendance: AttendanceCreate,
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.TEACHER]))
+):
+    """Mark student attendance"""
+    attendance_obj = Attendance(**attendance.model_dump())
+    doc = attendance_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['date'] = doc['date'].isoformat()
+    
+    await db.attendance.insert_one(doc)
+    return attendance_obj
+
+@api_router.post("/attendance/bulk")
+async def mark_bulk_attendance(
+    attendance_list: List[AttendanceCreate],
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.TEACHER]))
+):
+    """Mark attendance for multiple students at once"""
+    docs = []
+    for attendance in attendance_list:
+        attendance_obj = Attendance(**attendance.model_dump())
+        doc = attendance_obj.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        doc['date'] = doc['date'].isoformat()
+        docs.append(doc)
+    
+    if docs:
+        await db.attendance.insert_many(docs)
+    
+    return {"message": f"Marked attendance for {len(docs)} students"}
+
+@api_router.get("/attendance", response_model=List[Attendance])
+async def get_attendance(
+    student_id: Optional[str] = None,
+    class_id: Optional[str] = None,
+    section_id: Optional[str] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get attendance records"""
+    query = {}
+    if student_id:
+        query["student_id"] = student_id
+    if class_id:
+        query["class_id"] = class_id
+    if section_id:
+        query["section_id"] = section_id
+    
+    if date_from or date_to:
+        query["date"] = {}
+        if date_from:
+            query["date"]["$gte"] = date_from
+        if date_to:
+            query["date"]["$lte"] = date_to
+    
+    records = await db.attendance.find(query, {"_id": 0}).sort("date", -1).to_list(1000)
+    
+    for record in records:
+        if isinstance(record.get('created_at'), str):
+            record['created_at'] = datetime.fromisoformat(record['created_at'])
+        if isinstance(record.get('date'), str):
+            record['date'] = datetime.fromisoformat(record['date'])
+    
+    return [Attendance(**record) for record in records]
+
+@api_router.get("/attendance/stats")
+async def get_attendance_stats(
+    student_id: str,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get attendance statistics for a student"""
+    query = {"student_id": student_id}
+    
+    if date_from or date_to:
+        query["date"] = {}
+        if date_from:
+            query["date"]["$gte"] = date_from
+        if date_to:
+            query["date"]["$lte"] = date_to
+    
+    records = await db.attendance.find(query, {"_id": 0}).to_list(1000)
+    
+    total = len(records)
+    present = len([r for r in records if r['status'] == AttendanceStatus.PRESENT])
+    absent = len([r for r in records if r['status'] == AttendanceStatus.ABSENT])
+    late = len([r for r in records if r['status'] == AttendanceStatus.LATE])
+    
+    percentage = (present / total * 100) if total > 0 else 0
+    
+    return {
+        "total_days": total,
+        "present": present,
+        "absent": absent,
+        "late": late,
+        "percentage": round(percentage, 2)
+    }
+
+# ============ PHASE 3: Exam Management Routes ============
+
+@api_router.post("/exam-types", response_model=ExamType)
+async def create_exam_type(
+    exam_type: ExamTypeCreate,
+    current_user: User = Depends(require_role([UserRole.ADMIN]))
+):
+    """Create exam type"""
+    exam_type_obj = ExamType(**exam_type.model_dump())
+    doc = exam_type_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.exam_types.insert_one(doc)
+    return exam_type_obj
+
+@api_router.get("/exam-types", response_model=List[ExamType])
+async def get_exam_types(current_user: User = Depends(get_current_user)):
+    """Get all exam types"""
+    exam_types = await db.exam_types.find({}, {"_id": 0}).to_list(100)
+    
+    for exam_type in exam_types:
+        if isinstance(exam_type.get('created_at'), str):
+            exam_type['created_at'] = datetime.fromisoformat(exam_type['created_at'])
+    
+    return [ExamType(**exam_type) for exam_type in exam_types]
+
+@api_router.post("/exam-schedules", response_model=ExamSchedule)
+async def create_exam_schedule(
+    schedule: ExamScheduleCreate,
+    current_user: User = Depends(require_role([UserRole.ADMIN]))
+):
+    """Create exam schedule"""
+    schedule_obj = ExamSchedule(**schedule.model_dump())
+    doc = schedule_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    doc['exam_date'] = doc['exam_date'].isoformat()
+    
+    await db.exam_schedules.insert_one(doc)
+    return schedule_obj
+
+@api_router.get("/exam-schedules", response_model=List[ExamSchedule])
+async def get_exam_schedules(
+    class_id: Optional[str] = None,
+    exam_type_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get exam schedules"""
+    query = {}
+    if class_id:
+        query["class_id"] = class_id
+    if exam_type_id:
+        query["exam_type_id"] = exam_type_id
+    
+    schedules = await db.exam_schedules.find(query, {"_id": 0}).sort("exam_date", 1).to_list(1000)
+    
+    for schedule in schedules:
+        if isinstance(schedule.get('created_at'), str):
+            schedule['created_at'] = datetime.fromisoformat(schedule['created_at'])
+        if isinstance(schedule.get('updated_at'), str):
+            schedule['updated_at'] = datetime.fromisoformat(schedule['updated_at'])
+        if isinstance(schedule.get('exam_date'), str):
+            schedule['exam_date'] = datetime.fromisoformat(schedule['exam_date'])
+    
+    return [ExamSchedule(**schedule) for schedule in schedules]
+
+@api_router.post("/marks", response_model=MarksEntry)
+async def create_marks_entry(
+    marks: MarksEntryCreate,
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.TEACHER]))
+):
+    """Enter marks for a student"""
+    marks_obj = MarksEntry(**marks.model_dump())
+    doc = marks_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    
+    await db.marks.insert_one(doc)
+    return marks_obj
+
+@api_router.post("/marks/bulk")
+async def create_bulk_marks(
+    marks_list: List[MarksEntryCreate],
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.TEACHER]))
+):
+    """Enter marks for multiple students at once"""
+    docs = []
+    for marks in marks_list:
+        marks_obj = MarksEntry(**marks.model_dump())
+        doc = marks_obj.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        doc['updated_at'] = doc['updated_at'].isoformat()
+        docs.append(doc)
+    
+    if docs:
+        await db.marks.insert_many(docs)
+    
+    return {"message": f"Entered marks for {len(docs)} students"}
+
+@api_router.get("/marks", response_model=List[MarksEntry])
+async def get_marks(
+    student_id: Optional[str] = None,
+    exam_schedule_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get marks entries"""
+    query = {}
+    if student_id:
+        query["student_id"] = student_id
+    if exam_schedule_id:
+        query["exam_schedule_id"] = exam_schedule_id
+    
+    marks = await db.marks.find(query, {"_id": 0}).to_list(1000)
+    
+    for mark in marks:
+        if isinstance(mark.get('created_at'), str):
+            mark['created_at'] = datetime.fromisoformat(mark['created_at'])
+        if isinstance(mark.get('updated_at'), str):
+            mark['updated_at'] = datetime.fromisoformat(mark['updated_at'])
+    
+    return [MarksEntry(**mark) for mark in marks]
+
+@api_router.put("/marks/{marks_id}", response_model=MarksEntry)
+async def update_marks(
+    marks_id: str,
+    updates: dict,
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.TEACHER]))
+):
+    """Update marks entry"""
+    updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.marks.update_one({"id": marks_id}, {"$set": updates})
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Marks entry not found")
+    
+    marks = await db.marks.find_one({"id": marks_id}, {"_id": 0})
+    
+    if isinstance(marks.get('created_at'), str):
+        marks['created_at'] = datetime.fromisoformat(marks['created_at'])
+    if isinstance(marks.get('updated_at'), str):
+        marks['updated_at'] = datetime.fromisoformat(marks['updated_at'])
+    
+    return MarksEntry(**marks)
+
+@api_router.post("/grade-rules", response_model=GradeRule)
+async def create_grade_rule(
+    grade_rule: GradeRuleCreate,
+    current_user: User = Depends(require_role([UserRole.ADMIN]))
+):
+    """Create grade rule"""
+    grade_rule_obj = GradeRule(**grade_rule.model_dump())
+    doc = grade_rule_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.grade_rules.insert_one(doc)
+    return grade_rule_obj
+
+@api_router.get("/grade-rules", response_model=List[GradeRule])
+async def get_grade_rules(current_user: User = Depends(get_current_user)):
+    """Get all grade rules"""
+    grade_rules = await db.grade_rules.find({}, {"_id": 0}).sort("min_percentage", -1).to_list(100)
+    
+    for grade_rule in grade_rules:
+        if isinstance(grade_rule.get('created_at'), str):
+            grade_rule['created_at'] = datetime.fromisoformat(grade_rule['created_at'])
+    
+    return [GradeRule(**grade_rule) for grade_rule in grade_rules]
+
+@api_router.get("/report-card/{student_id}")
+async def get_report_card(
+    student_id: str,
+    exam_type_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Generate report card for a student"""
+    # Get student info
+    student = await db.students.find_one({"id": student_id}, {"_id": 0})
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    
+    # Get exam schedules for student's class
+    query = {"class_id": student['class_id']}
+    if exam_type_id:
+        query["exam_type_id"] = exam_type_id
+    
+    schedules = await db.exam_schedules.find(query, {"_id": 0}).to_list(1000)
+    
+    # Get marks for each schedule
+    results = []
+    total_marks_obtained = 0
+    total_marks_possible = 0
+    
+    for schedule in schedules:
+        marks = await db.marks.find_one({
+            "student_id": student_id,
+            "exam_schedule_id": schedule['id']
+        }, {"_id": 0})
+        
+        if marks:
+            total_marks_obtained += marks['marks_obtained']
+            total_marks_possible += schedule['total_marks']
+            
+            # Get subject name
+            subject = await db.subjects.find_one({"id": schedule['subject_id']}, {"_id": 0})
+            
+            results.append({
+                "subject_name": subject['name'] if subject else "Unknown",
+                "subject_code": subject['code'] if subject else "",
+                "marks_obtained": marks['marks_obtained'],
+                "total_marks": schedule['total_marks'],
+                "percentage": round((marks['marks_obtained'] / schedule['total_marks'] * 100), 2),
+                "remarks": marks.get('remarks', '')
+            })
+    
+    # Calculate overall percentage
+    overall_percentage = (total_marks_obtained / total_marks_possible * 100) if total_marks_possible > 0 else 0
+    
+    # Determine grade
+    grade_rules = await db.grade_rules.find({}, {"_id": 0}).sort("min_percentage", -1).to_list(100)
+    grade = "N/A"
+    for rule in grade_rules:
+        if rule['min_percentage'] <= overall_percentage <= rule['max_percentage']:
+            grade = rule['name']
+            break
+    
+    return {
+        "student": student,
+        "results": results,
+        "total_marks_obtained": total_marks_obtained,
+        "total_marks_possible": total_marks_possible,
+        "overall_percentage": round(overall_percentage, 2),
+        "grade": grade
+    }
+
+# ============ PHASE 4: Financial Management Routes ============
+
+@api_router.post("/fee-types", response_model=FeeType)
+async def create_fee_type(
+    fee_type: FeeTypeCreate,
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.ACCOUNTANT]))
+):
+    """Create fee type"""
+    fee_type_obj = FeeType(**fee_type.model_dump())
+    doc = fee_type_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.fee_types.insert_one(doc)
+    return fee_type_obj
+
+@api_router.get("/fee-types", response_model=List[FeeType])
+async def get_fee_types(current_user: User = Depends(get_current_user)):
+    """Get all fee types"""
+    fee_types = await db.fee_types.find({}, {"_id": 0}).to_list(100)
+    
+    for fee_type in fee_types:
+        if isinstance(fee_type.get('created_at'), str):
+            fee_type['created_at'] = datetime.fromisoformat(fee_type['created_at'])
+    
+    return [FeeType(**fee_type) for fee_type in fee_types]
+
+@api_router.post("/fee-structures", response_model=FeeStructure)
+async def create_fee_structure(
+    fee_structure: FeeStructureCreate,
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.ACCOUNTANT]))
+):
+    """Create fee structure"""
+    fee_structure_obj = FeeStructure(**fee_structure.model_dump())
+    doc = fee_structure_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    if doc.get('due_date'):
+        doc['due_date'] = doc['due_date'].isoformat()
+    
+    await db.fee_structures.insert_one(doc)
+    return fee_structure_obj
+
+@api_router.get("/fee-structures", response_model=List[FeeStructure])
+async def get_fee_structures(
+    class_id: Optional[str] = None,
+    school_year_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get fee structures"""
+    query = {}
+    if class_id:
+        query["class_id"] = class_id
+    if school_year_id:
+        query["school_year_id"] = school_year_id
+    
+    structures = await db.fee_structures.find(query, {"_id": 0}).to_list(1000)
+    
+    for structure in structures:
+        if isinstance(structure.get('created_at'), str):
+            structure['created_at'] = datetime.fromisoformat(structure['created_at'])
+        if structure.get('due_date') and isinstance(structure['due_date'], str):
+            structure['due_date'] = datetime.fromisoformat(structure['due_date'])
+    
+    return [FeeStructure(**structure) for structure in structures]
+
+@api_router.post("/invoices", response_model=Invoice)
+async def create_invoice(
+    invoice: InvoiceCreate,
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.ACCOUNTANT]))
+):
+    """Create invoice"""
+    invoice_obj = Invoice(**invoice.model_dump())
+    doc = invoice_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    doc['issue_date'] = doc['issue_date'].isoformat()
+    doc['due_date'] = doc['due_date'].isoformat()
+    
+    await db.invoices.insert_one(doc)
+    return invoice_obj
+
+@api_router.get("/invoices", response_model=List[Invoice])
+async def get_invoices(
+    student_id: Optional[str] = None,
+    status: Optional[InvoiceStatus] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get invoices"""
+    query = {}
+    if student_id:
+        query["student_id"] = student_id
+    if status:
+        query["status"] = status
+    
+    invoices = await db.invoices.find(query, {"_id": 0}).sort("issue_date", -1).to_list(1000)
+    
+    for invoice in invoices:
+        if isinstance(invoice.get('created_at'), str):
+            invoice['created_at'] = datetime.fromisoformat(invoice['created_at'])
+        if isinstance(invoice.get('updated_at'), str):
+            invoice['updated_at'] = datetime.fromisoformat(invoice['updated_at'])
+        if isinstance(invoice.get('issue_date'), str):
+            invoice['issue_date'] = datetime.fromisoformat(invoice['issue_date'])
+        if isinstance(invoice.get('due_date'), str):
+            invoice['due_date'] = datetime.fromisoformat(invoice['due_date'])
+    
+    return [Invoice(**invoice) for invoice in invoices]
+
+@api_router.get("/invoices/{invoice_id}", response_model=Invoice)
+async def get_invoice(
+    invoice_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get invoice by ID"""
+    invoice = await db.invoices.find_one({"id": invoice_id}, {"_id": 0})
+    
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    
+    if isinstance(invoice.get('created_at'), str):
+        invoice['created_at'] = datetime.fromisoformat(invoice['created_at'])
+    if isinstance(invoice.get('updated_at'), str):
+        invoice['updated_at'] = datetime.fromisoformat(invoice['updated_at'])
+    if isinstance(invoice.get('issue_date'), str):
+        invoice['issue_date'] = datetime.fromisoformat(invoice['issue_date'])
+    if isinstance(invoice.get('due_date'), str):
+        invoice['due_date'] = datetime.fromisoformat(invoice['due_date'])
+    
+    return Invoice(**invoice)
+
+@api_router.put("/invoices/{invoice_id}", response_model=Invoice)
+async def update_invoice(
+    invoice_id: str,
+    updates: dict,
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.ACCOUNTANT]))
+):
+    """Update invoice"""
+    updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.invoices.update_one({"id": invoice_id}, {"$set": updates})
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    
+    invoice = await db.invoices.find_one({"id": invoice_id}, {"_id": 0})
+    
+    if isinstance(invoice.get('created_at'), str):
+        invoice['created_at'] = datetime.fromisoformat(invoice['created_at'])
+    if isinstance(invoice.get('updated_at'), str):
+        invoice['updated_at'] = datetime.fromisoformat(invoice['updated_at'])
+    if isinstance(invoice.get('issue_date'), str):
+        invoice['issue_date'] = datetime.fromisoformat(invoice['issue_date'])
+    if isinstance(invoice.get('due_date'), str):
+        invoice['due_date'] = datetime.fromisoformat(invoice['due_date'])
+    
+    return Invoice(**invoice)
+
+@api_router.post("/payments", response_model=Payment)
+async def create_payment(
+    payment: PaymentCreate,
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.ACCOUNTANT]))
+):
+    """Record payment"""
+    payment_obj = Payment(**payment.model_dump())
+    doc = payment_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['payment_date'] = doc['payment_date'].isoformat()
+    
+    await db.payments.insert_one(doc)
+    
+    # Update invoice paid amount and status
+    invoice = await db.invoices.find_one({"id": payment.invoice_id}, {"_id": 0})
+    if invoice:
+        new_paid_amount = invoice['paid_amount'] + payment.amount
+        new_status = InvoiceStatus.PAID if new_paid_amount >= invoice['total_amount'] else InvoiceStatus.PARTIALLY_PAID
+        
+        await db.invoices.update_one(
+            {"id": payment.invoice_id},
+            {"$set": {
+                "paid_amount": new_paid_amount,
+                "status": new_status,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+    
+    return payment_obj
+
+@api_router.get("/payments", response_model=List[Payment])
+async def get_payments(
+    student_id: Optional[str] = None,
+    invoice_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get payments"""
+    query = {}
+    if student_id:
+        query["student_id"] = student_id
+    if invoice_id:
+        query["invoice_id"] = invoice_id
+    
+    payments = await db.payments.find(query, {"_id": 0}).sort("payment_date", -1).to_list(1000)
+    
+    for payment in payments:
+        if isinstance(payment.get('created_at'), str):
+            payment['created_at'] = datetime.fromisoformat(payment['created_at'])
+        if isinstance(payment.get('payment_date'), str):
+            payment['payment_date'] = datetime.fromisoformat(payment['payment_date'])
+    
+    return [Payment(**payment) for payment in payments]
+
+@api_router.post("/income", response_model=Income)
+async def create_income(
+    income: IncomeCreate,
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.ACCOUNTANT]))
+):
+    """Record income"""
+    income_obj = Income(**income.model_dump())
+    doc = income_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['date'] = doc['date'].isoformat()
+    
+    await db.income.insert_one(doc)
+    return income_obj
+
+@api_router.get("/income", response_model=List[Income])
+async def get_income(
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    category: Optional[IncomeCategory] = None,
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.ACCOUNTANT]))
+):
+    """Get income records"""
+    query = {}
+    if category:
+        query["category"] = category
+    
+    if date_from or date_to:
+        query["date"] = {}
+        if date_from:
+            query["date"]["$gte"] = date_from
+        if date_to:
+            query["date"]["$lte"] = date_to
+    
+    income_records = await db.income.find(query, {"_id": 0}).sort("date", -1).to_list(1000)
+    
+    for income in income_records:
+        if isinstance(income.get('created_at'), str):
+            income['created_at'] = datetime.fromisoformat(income['created_at'])
+        if isinstance(income.get('date'), str):
+            income['date'] = datetime.fromisoformat(income['date'])
+    
+    return [Income(**income) for income in income_records]
+
+@api_router.post("/expenses", response_model=Expense)
+async def create_expense(
+    expense: ExpenseCreate,
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.ACCOUNTANT]))
+):
+    """Record expense"""
+    expense_obj = Expense(**expense.model_dump())
+    doc = expense_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['date'] = doc['date'].isoformat()
+    
+    await db.expenses.insert_one(doc)
+    return expense_obj
+
+@api_router.get("/expenses", response_model=List[Expense])
+async def get_expenses(
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    category: Optional[ExpenseCategory] = None,
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.ACCOUNTANT]))
+):
+    """Get expense records"""
+    query = {}
+    if category:
+        query["category"] = category
+    
+    if date_from or date_to:
+        query["date"] = {}
+        if date_from:
+            query["date"]["$gte"] = date_from
+        if date_to:
+            query["date"]["$lte"] = date_to
+    
+    expense_records = await db.expenses.find(query, {"_id": 0}).sort("date", -1).to_list(1000)
+    
+    for expense in expense_records:
+        if isinstance(expense.get('created_at'), str):
+            expense['created_at'] = datetime.fromisoformat(expense['created_at'])
+        if isinstance(expense.get('date'), str):
+            expense['date'] = datetime.fromisoformat(expense['date'])
+    
+    return [Expense(**expense) for expense in expense_records]
+
+@api_router.get("/financial-reports")
+async def get_financial_reports(
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.ACCOUNTANT]))
+):
+    """Get financial summary report"""
+    query = {}
+    if date_from or date_to:
+        query["date"] = {}
+        if date_from:
+            query["date"]["$gte"] = date_from
+        if date_to:
+            query["date"]["$lte"] = date_to
+    
+    # Get income
+    income_records = await db.income.find(query, {"_id": 0}).to_list(10000)
+    total_income = sum(record['amount'] for record in income_records)
+    
+    # Get expenses
+    expense_records = await db.expenses.find(query, {"_id": 0}).to_list(10000)
+    total_expenses = sum(record['amount'] for record in expense_records)
+    
+    # Get fee collection
+    payment_query = {}
+    if date_from or date_to:
+        payment_query["payment_date"] = {}
+        if date_from:
+            payment_query["payment_date"]["$gte"] = date_from
+        if date_to:
+            payment_query["payment_date"]["$lte"] = date_to
+    
+    payments = await db.payments.find(payment_query, {"_id": 0}).to_list(10000)
+    total_fee_collected = sum(payment['amount'] for payment in payments)
+    
+    # Get pending fees
+    pending_invoices = await db.invoices.find({
+        "status": {"$in": [InvoiceStatus.PENDING, InvoiceStatus.PARTIALLY_PAID, InvoiceStatus.OVERDUE]}
+    }, {"_id": 0}).to_list(10000)
+    total_pending = sum(invoice['total_amount'] - invoice['paid_amount'] for invoice in pending_invoices)
+    
+    return {
+        "total_income": total_income,
+        "total_expenses": total_expenses,
+        "total_fee_collected": total_fee_collected,
+        "total_pending_fees": total_pending,
+        "net_profit": total_income - total_expenses,
+        "income_by_category": {},
+        "expenses_by_category": {}
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
