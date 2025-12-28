@@ -1,28 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { PlusIcon } from '@heroicons/react/24/outline';
+import { useToast } from '../hooks/use-toast';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const ClassesManagement = () => {
   const { token } = useAuth();
+  const { toast } = useToast();
   const [classes, setClasses] = useState([]);
   const [sections, setSections] = useState([]);
-  const [schoolYears, setSchoolYears] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showClassModal, setShowClassModal] = useState(false);
-  const [showSectionModal, setShowSectionModal] = useState(false);
-  const [classFormData, setClassFormData] = useState({
-    name: '',
-    numeric: '',
-    school_year_id: '',
-    sections: []
-  });
-  const [sectionFormData, setSectionFormData] = useState({
-    name: '',
-    capacity: ''
-  });
+  const [classDialogOpen, setClassDialogOpen] = useState(false);
+  const [sectionDialogOpen, setSectionDialogOpen] = useState(false);
+  const [classFormData, setClassFormData] = useState({ name: '', grade_level: '' });
+  const [sectionFormData, setSectionFormData] = useState({ name: '', class_id: '', capacity: '' });
 
   useEffect(() => {
     fetchData();
@@ -30,230 +29,230 @@ const ClassesManagement = () => {
 
   const fetchData = async () => {
     try {
-      const [classesRes, sectionsRes, yearsRes] = await Promise.all([
-        axios.get(`${API_URL}/api/classes`, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(`${API_URL}/api/sections`, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(`${API_URL}/api/school-years`, { headers: { Authorization: `Bearer ${token}` } })
+      const [classesRes, sectionsRes] = await Promise.all([
+        fetch(`${BACKEND_URL}/api/classes`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${BACKEND_URL}/api/sections`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
-      setClasses(classesRes.data);
-      setSections(sectionsRes.data);
-      setSchoolYears(yearsRes.data);
+      if (classesRes.ok) setClasses(await classesRes.json());
+      if (sectionsRes.ok) setSections(await sectionsRes.json());
     } catch (error) {
-      console.error('Error fetching data:', error);
+      toast({ title: 'Error', description: 'Failed to fetch data', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateClass = async (e) => {
+  const handleClassSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_URL}/api/classes`, classFormData, {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await fetch(`${BACKEND_URL}/api/classes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ ...classFormData, grade_level: parseInt(classFormData.grade_level) })
       });
-      setShowClassModal(false);
-      setClassFormData({ name: '', numeric: '', school_year_id: '', sections: [] });
-      fetchData();
+
+      if (response.ok) {
+        toast({ title: 'Success', description: 'Class created successfully' });
+        setClassDialogOpen(false);
+        setClassFormData({ name: '', grade_level: '' });
+        fetchData();
+      } else {
+        const error = await response.json();
+        toast({ title: 'Error', description: error.detail || 'Failed to create class', variant: 'destructive' });
+      }
     } catch (error) {
-      console.error('Error creating class:', error);
-      alert('Error creating class');
+      toast({ title: 'Error', description: 'Failed to create class', variant: 'destructive' });
     }
   };
 
-  const handleCreateSection = async (e) => {
+  const handleSectionSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_URL}/api/sections`, sectionFormData, {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await fetch(`${BACKEND_URL}/api/sections`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ ...sectionFormData, capacity: parseInt(sectionFormData.capacity) })
       });
-      setShowSectionModal(false);
-      setSectionFormData({ name: '', capacity: '' });
-      fetchData();
+
+      if (response.ok) {
+        toast({ title: 'Success', description: 'Section created successfully' });
+        setSectionDialogOpen(false);
+        setSectionFormData({ name: '', class_id: '', capacity: '' });
+        fetchData();
+      } else {
+        const error = await response.json();
+        toast({ title: 'Error', description: error.detail || 'Failed to create section', variant: 'destructive' });
+      }
     } catch (error) {
-      console.error('Error creating section:', error);
-      alert('Error creating section');
+      toast({ title: 'Error', description: 'Failed to create section', variant: 'destructive' });
     }
   };
+
+  const getClassById = (classId) => classes.find(c => c.id === classId);
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64">Loading...</div>;
+    return <div className="flex justify-center items-center h-64">Loading...</div>;
   }
 
   return (
     <div className="space-y-6">
-      {/* Sections */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Sections</h2>
-          <button
-            onClick={() => setShowSectionModal(true)}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            <PlusIcon className="w-5 h-5 mr-2" />
-            Add Section
-          </button>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900">Classes & Sections</h2>
+          <p className="text-gray-600 mt-1">Manage classes and their sections</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          {sections.map((section) => (
-            <div key={section.id} className="border rounded-lg p-3 text-center hover:shadow-md transition-shadow">
-              <h3 className="text-lg font-semibold">Section {section.name}</h3>
-              {section.capacity && (
-                <p className="text-sm text-gray-600">Capacity: {section.capacity}</p>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Classes */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Classes</h2>
-          <button
-            onClick={() => setShowClassModal(true)}
-            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
-            <PlusIcon className="w-5 h-5 mr-2" />
-            Add Class
-          </button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Numeric</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">School Year</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {classes.map((cls) => (
-                <tr key={cls.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap font-medium">{cls.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{cls.numeric}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {schoolYears.find(y => y.id === cls.school_year_id)?.year || 'N/A'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Section Modal */}
-      {showSectionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h3 className="text-xl font-bold mb-4">Add Section</h3>
-            <form onSubmit={handleCreateSection}>
-              <div className="space-y-4">
+        <div className="flex gap-2">
+          <Dialog open={classDialogOpen} onOpenChange={setClassDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <PlusIcon className="w-5 h-5" />
+                Add Class
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Class</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleClassSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Section Name</label>
-                  <input
-                    type="text"
-                    placeholder="A"
-                    value={sectionFormData.name}
-                    onChange={(e) => setSectionFormData({ ...sectionFormData, name: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Capacity (Optional)</label>
-                  <input
-                    type="number"
-                    placeholder="30"
-                    value={sectionFormData.capacity}
-                    onChange={(e) => setSectionFormData({ ...sectionFormData, capacity: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowSectionModal(false)}
-                  className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Create
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Class Modal */}
-      {showClassModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h3 className="text-xl font-bold mb-4">Add Class</h3>
-            <form onSubmit={handleCreateClass}>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Class Name</label>
-                  <input
-                    type="text"
-                    placeholder="Class 1"
+                  <Label htmlFor="name">Class Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="e.g., Grade 10"
                     value={classFormData.name}
                     onChange={(e) => setClassFormData({ ...classFormData, name: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Numeric (1-12)</label>
-                  <input
+                  <Label htmlFor="grade_level">Grade Level</Label>
+                  <Input
+                    id="grade_level"
                     type="number"
-                    min="1"
-                    max="12"
-                    value={classFormData.numeric}
-                    onChange={(e) => setClassFormData({ ...classFormData, numeric: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., 10"
+                    value={classFormData.grade_level}
+                    onChange={(e) => setClassFormData({ ...classFormData, grade_level: e.target.value })}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full">Create Class</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={sectionDialogOpen} onOpenChange={setSectionDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="flex items-center gap-2">
+                <PlusIcon className="w-5 h-5" />
+                Add Section
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Section</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSectionSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="section_name">Section Name</Label>
+                  <Input
+                    id="section_name"
+                    placeholder="e.g., A, B, C"
+                    value={sectionFormData.name}
+                    onChange={(e) => setSectionFormData({ ...sectionFormData, name: e.target.value })}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">School Year</label>
-                  <select
-                    value={classFormData.school_year_id}
-                    onChange={(e) => setClassFormData({ ...classFormData, school_year_id: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                    required
+                  <Label htmlFor="class_id">Select Class</Label>
+                  <Select
+                    value={sectionFormData.class_id}
+                    onValueChange={(value) => setSectionFormData({ ...sectionFormData, class_id: value })}
                   >
-                    <option value="">Select School Year</option>
-                    {schoolYears.map((year) => (
-                      <option key={year.id} value={year.id}>{year.year}</option>
-                    ))}
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a class" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {classes.map((cls) => (
+                        <SelectItem key={cls.id} value={cls.id}>{cls.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
-              <div className="flex gap-2 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowClassModal(false)}
-                  className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                >
-                  Create
-                </button>
-              </div>
-            </form>
-          </div>
+                <div>
+                  <Label htmlFor="capacity">Capacity</Label>
+                  <Input
+                    id="capacity"
+                    type="number"
+                    placeholder="e.g., 40"
+                    value={sectionFormData.capacity}
+                    onChange={(e) => setSectionFormData({ ...sectionFormData, capacity: e.target.value })}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full">Create Section</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
-      )}
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Classes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Class Name</TableHead>
+                  <TableHead>Grade Level</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {classes.map((cls) => (
+                  <TableRow key={cls.id}>
+                    <TableCell className="font-medium">{cls.name}</TableCell>
+                    <TableCell>{cls.grade_level}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Sections</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Section</TableHead>
+                  <TableHead>Class</TableHead>
+                  <TableHead>Capacity</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sections.map((section) => (
+                  <TableRow key={section.id}>
+                    <TableCell className="font-medium">{section.name}</TableCell>
+                    <TableCell>{getClassById(section.class_id)?.name || 'N/A'}</TableCell>
+                    <TableCell>{section.capacity}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
