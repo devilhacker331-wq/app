@@ -1475,6 +1475,9 @@ async def get_financial_reports(
 # Include the router in the main app
 app.include_router(api_router)
 
+# Mount static files for uploads
+app.mount("/api/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
