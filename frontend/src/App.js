@@ -97,12 +97,35 @@ function AppRoutes() {
         }
       />
       
+      {/* Phase 2 - Academic Core Routes */}
       <Route
-        path="/teachers"
+        path="/school-years"
         element={
           <ProtectedRoute allowedRoles={['admin']}>
             <Layout>
-              <Teachers />
+              <SchoolYearsManagement />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
+        path="/classes"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <Layout>
+              <ClassesManagement />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
+        path="/subjects"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <Layout>
+              <SubjectsManagement />
             </Layout>
           </ProtectedRoute>
         }
@@ -113,51 +136,41 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={['admin', 'teacher']}>
             <Layout>
-              <Students />
+              <StudentsManagement />
             </Layout>
           </ProtectedRoute>
         }
       />
       
       <Route
-        path="/parents"
+        path="/teachers"
         element={
           <ProtectedRoute allowedRoles={['admin']}>
             <Layout>
-              <Parents />
+              <TeachersManagement />
             </Layout>
           </ProtectedRoute>
         }
       />
       
       <Route
-        path="/classes"
+        path="/timetable"
         element={
           <ProtectedRoute allowedRoles={['admin', 'teacher']}>
             <Layout>
-              <Classes />
+              <TimetableManagement />
             </Layout>
           </ProtectedRoute>
         }
       />
       
-      <Route
-        path="/subjects"
-        element={
-          <ProtectedRoute allowedRoles={['admin', 'teacher']}>
-            <Layout>
-              <Subjects />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      
+      {/* Phase 3 - Attendance & Exams Routes */}
       <Route
         path="/attendance"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['admin', 'teacher']}>
             <Layout>
-              <Attendance />
+              <AttendanceManagement />
             </Layout>
           </ProtectedRoute>
         }
@@ -166,20 +179,33 @@ function AppRoutes() {
       <Route
         path="/exams"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['admin', 'teacher']}>
             <Layout>
-              <Exams />
+              <ExamsManagement />
             </Layout>
           </ProtectedRoute>
         }
       />
       
+      {/* Phase 4 - Finance Routes */}
       <Route
         path="/finance"
         element={
-          <ProtectedRoute allowedRoles={['admin', 'accountant', 'parent']}>
+          <ProtectedRoute allowedRoles={['admin', 'accountant']}>
             <Layout>
-              <Finance />
+              <FinanceManagement />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Placeholder routes */}
+      <Route
+        path="/parents"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <Layout>
+              <Parents />
             </Layout>
           </ProtectedRoute>
         }
