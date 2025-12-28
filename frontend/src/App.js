@@ -6,9 +6,26 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import './App.css';
 
-// Placeholder pages for Phase 2+
+// Phase 2 - Academic Core
+import SchoolYearsManagement from './pages/SchoolYearsManagement';
+import ClassesManagement from './pages/ClassesManagement';
+import SubjectsManagement from './pages/SubjectsManagement';
+import StudentsManagement from './pages/StudentsManagement';
+import TeachersManagement from './pages/TeachersManagement';
+import TimetableManagement from './pages/TimetableManagement';
+
+// Phase 3 - Attendance & Exams
+import AttendanceManagement from './pages/AttendanceManagement';
+import ExamsManagement from './pages/ExamsManagement';
+
+// Phase 4 - Finance
+import FinanceManagement from './pages/FinanceManagement';
+
+import './App.css';
+import { Toaster } from './components/ui/toaster';
+
+// Placeholder pages for remaining features
 const Users = () => (
   <div className="bg-white rounded-xl shadow-sm p-6">
     <h2 className="text-2xl font-bold mb-4">Users Management</h2>
@@ -16,59 +33,10 @@ const Users = () => (
   </div>
 );
 
-const Teachers = () => (
-  <div className="bg-white rounded-xl shadow-sm p-6">
-    <h2 className="text-2xl font-bold mb-4">Teachers Management</h2>
-    <p className="text-gray-600">Teachers management interface coming in next update...</p>
-  </div>
-);
-
-const Students = () => (
-  <div className="bg-white rounded-xl shadow-sm p-6">
-    <h2 className="text-2xl font-bold mb-4">Students Management</h2>
-    <p className="text-gray-600">Students management interface coming in next update...</p>
-  </div>
-);
-
 const Parents = () => (
   <div className="bg-white rounded-xl shadow-sm p-6">
     <h2 className="text-2xl font-bold mb-4">Parents Management</h2>
     <p className="text-gray-600">Parents management interface coming in next update...</p>
-  </div>
-);
-
-const Classes = () => (
-  <div className="bg-white rounded-xl shadow-sm p-6">
-    <h2 className="text-2xl font-bold mb-4">Classes Management</h2>
-    <p className="text-gray-600">Classes management interface coming in next update...</p>
-  </div>
-);
-
-const Subjects = () => (
-  <div className="bg-white rounded-xl shadow-sm p-6">
-    <h2 className="text-2xl font-bold mb-4">Subjects Management</h2>
-    <p className="text-gray-600">Subjects management interface coming in next update...</p>
-  </div>
-);
-
-const Attendance = () => (
-  <div className="bg-white rounded-xl shadow-sm p-6">
-    <h2 className="text-2xl font-bold mb-4">Attendance Management</h2>
-    <p className="text-gray-600">Attendance management interface coming in next update...</p>
-  </div>
-);
-
-const Exams = () => (
-  <div className="bg-white rounded-xl shadow-sm p-6">
-    <h2 className="text-2xl font-bold mb-4">Exams Management</h2>
-    <p className="text-gray-600">Exams management interface coming in next update...</p>
-  </div>
-);
-
-const Finance = () => (
-  <div className="bg-white rounded-xl shadow-sm p-6">
-    <h2 className="text-2xl font-bold mb-4">Finance Management</h2>
-    <p className="text-gray-600">Finance management interface coming in next update...</p>
   </div>
 );
 
